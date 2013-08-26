@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Slider for AngularJS</title>
+    <!--<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootswatch/2.3.1/spruce/bootstrap.min.css">-->
+    <style>
+
+	slider {
+		display:        block;
+		position:       relative;
+		height:         30px;
+		width:          500px;
+		margin:         50px 0 50px 100px;
+		vertical-align: middle;
+	}
+
+	slider span {
+		white-space: nowrap;
+		position:    absolute;
+		display:     inline-block;
+	}
+
+	slider span.base {
+		width:   100%;
+		height:  100%;
+		padding: 0;
+	}
+
+	slider span.bar {
+		width:      100%;
+		height:     50%;
+		z-index:    0;
+		background: #eee;
+		left:       0;
+		top: 25%;
+		cursor: pointer;
+	}
+
+	slider span.bar.selection, slider span.bar.unselected {
+	}
+
+	slider span.bar.selection {
+		background: #0a0;
+		opacity:    0.5;
+	}
+
+	slider span.bar.unselected {
+		width:      auto;
+		background: #a00;
+		opacity:    0.5;
+	}
+
+	slider span.pointer {
+		cursor:           pointer;
+		width:            15px;
+		top:              0;
+		bottom:           0;
+		background-color: #00a;
+	}
+
+	slider span.pointer:hover {
+	}
+
+	slider span.pointer.active {
+	}
+
+	slider span.bubble {
+		font-size:   0.7em;
+		line-height: 1.4em;
+		font-family: sans-serif;
+		text-align:  center;
+		text-shadow: none;
+		top:         -1.3em;
+		cursor: pointer;
+	}
+
+	slider span.bubble.selection, slider span.bubble.limit {
+		top: 25%;
+	}
+
+	slider span.bubble.selection {
+	}
+
+	slider span.bubble.limit {
+	}
+
+	slider span.bubble.low, slider span.bubble.high {
+	}
+
+	#slider-container {
+		-webkit-touch-callout: none;
+		-webkit-user-select: none;
+		-khtml-user-select: none;
+		-moz-user-select: -moz-none;
+		-ms-user-select: none;
+		user-select: none;
+	}
+
+    </style>
+</head>
+<body id='ng-app' ng-app="ExampleApp">
+
+	<div id='slider-container' ng-controller="MainCtrl">
+	    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' buffer='{{ buffer }}' stretch='{{ stretch }}' ng-model-low='values.low' ng-model-high='values.high' translate='translate'></slider>
+	    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' stretch='{{ stretch }}' ng-model='value'></slider>
+		Floor: <input type='text' ng-model='floor' ng-init='floor = 1' /><br/>
+		Ceiling: <input type='text' ng-model='ceiling' ng-init='ceiling = 10' /><br/>
+		Step Width: <input type='text' ng-model='step' ng-init='step = 1' /><br/>
+		Precision: <input type='text' ng-model='precision' ng-init='precision = 2' /><br/>
+		Buffer: <input type='text' ng-model='buffer' ng-init='buffer = 2' /><br/>
+		Stretch Resistance: <input type='text' ng-model='stretch' ng-init='stretch = 3' /><br/>
+		Values: <input ng-model="values.low" type="text" /><input ng-model="values.high" type="text" /> <br />
+		Value: <input ng-model="value" type="text" />
+    </div>
+	<script src="app/components/angular/angular.js"></script>
+    <script src="src/angular-slider.js"></script>
+    <script>
+	    var doc = null;
+        angular.module('ExampleApp', ['vr.directives.slider'])
+			.controller('MainCtrl', ['$scope', '$document', function($scope, $document) {
+			    $scope.values = {
+			        low : 4,
+			        high: 7
+			    };
+			    $scope.value = 5;
+			    $scope.translate = function(value) {
+				    return '$'+value;
+			    };
+			    doc = $document;
+			}]);
+    </script>
+</body>
+</html>

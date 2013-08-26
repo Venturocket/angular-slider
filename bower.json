@@ -1,0 +1,17 @@
+{
+    "name": "angular-slider",
+    "version": "0.0.1",
+    "main": "./build/angular-natural-language.min.js",
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "components"
+    ],
+    "dependencies": {
+        "angular": "~1.0.7"
+    },
+    "devDependencies": {
+        "angular-mocks": "*",
+		"angular-scenario": "*"
+    }
+}
