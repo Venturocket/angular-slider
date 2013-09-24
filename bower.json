@@ -1,7 +1,7 @@
 {
     "name": "angular-slider",
-    "version": "0.0.1",
-    "main": "./build/angular-natural-language.min.js",
+    "version": "0.0.3",
+    "main": "./build/angular-slider.min.js",
     "ignore": [
         "**/.*",
         "node_modules",

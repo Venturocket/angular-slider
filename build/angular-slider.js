@@ -335,9 +335,9 @@ angular.module('vr.directives.slider',[])
 							onEnd = function() {
 								stickyOffsetLow = 0;
 								stickyOffsetHigh = 0;
-								setPointers();
-								adjustBubbles();
 								if(pointer) {
+									setPointers();
+									adjustBubbles();
 									pointer.removeClass('active');
 								}
 								pointer = null;
