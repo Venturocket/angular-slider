@@ -160,6 +160,9 @@ angular.module('vr.directives.slider',['ngTouch'])
 						maxInput.attr('min',expression("ngModelLow + (buffer / 2)"));
 						maxInput.attr('max',expression("ceiling"));
 						maxInput.css(inputStyles);
+						selInput.attr('step',expression("inputSteps()"));
+						selInput.attr('min',expression("ngModelLow"));
+						selInput.attr('max',expression("ngModelHigh"));
 						selInput.css(inputStyles);
 					} else {
 						minInput.attr('max',expression("ceiling"));
@@ -172,6 +175,7 @@ angular.module('vr.directives.slider',['ngTouch'])
 				} else {
 					minInput.remove();
 					maxInput.remove();
+					selInput.remove();
 				}
 				bindHtml(ceilBub, expression("translation(ceiling)"));
 				bindHtml(flrBub, expression("translation(floor)"));
@@ -191,12 +195,6 @@ angular.module('vr.directives.slider',['ngTouch'])
 					watchables.push(refHigh);
 					watchables.push('buffer');
 				}
-				if(inputs) {
-					watchables.push('inputValues.low');
-					if(range) {
-						watchables.push('inputValues.high');
-					}
-				}
 				return {
 					post: function(scope, element, attributes) {
 
@@ -210,11 +208,6 @@ angular.module('vr.directives.slider',['ngTouch'])
 						
 						scope.inputSteps = function() {
 							return Math.pow(10,scope.precision*-1);
-						};
-						
-						scope.inputValues = {
-							low: angular.copy(range ? scope.ngModelLow : scope.ngModel),
-							high: angular.copy(scope.ngModelHigh)
 						};
 
 						var barWidth, boundToInputs, dimensions, maxOffset, maxValue, minOffset, minValue, offsetRange, pointerHalfWidth, updateDOM, valueRange, w, _j, _len1, stickyOffsetLow = 0, stickyOffsetHigh = 0;
