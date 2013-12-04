@@ -7,16 +7,23 @@ Slider directive for AngularJS. Based on: http://github.com/prajwalkman/angular-
 - Adjustable knob "Stickiness"
 - Adjustable minimum range width
 - Draggable range
-- Touch and IE10/Win8 pointer event support
+- Touch and IE10+/Win8 pointer event support
 
 ## Known Issues
-- Doesn't work in IE<9
+- Doesn't work in IE8-
 
 ## Usage
+### Requirements
+```html
+<script src="lib/modernizr.custom.72715.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.3/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.3/angular-touch.min.js"></script>
+<script src="build/angular-slider.min.js"></script>
+```
 ### Single Knob
 #### Markup
 As an element:
-```
+```html
 <slider
 	ng-model="{string}"
 	floor="{float}"
@@ -28,7 +35,7 @@ As an element:
 </slider>
 ```
 As an attribute:
-```
+```html
 <div
 	slider
 	ng-model="{string}"
@@ -55,7 +62,7 @@ As an attribute:
 ### Dual Knob
 #### Markup
 As an element:
-```
+```html
 <slider
 	ng-model-low="{string}"
 	ng-model-high="{string}"
@@ -68,7 +75,7 @@ As an element:
 </slider>
 ```
 As an attribute:
-```
+```html
 <div
 	slider
 	ng-model-low="{string}"
