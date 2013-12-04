@@ -39,6 +39,7 @@ describe("Unit: Slider Directive", function() {
 
 		it('should create a new non-range slider', function() {
 			expect(element.find('span').length).toBe(5);
+			expect(element.find('input').length).toBe(1);
 
 			// should be only one bar
 			var bar = element.find('.bar');
@@ -60,12 +61,12 @@ describe("Unit: Slider Directive", function() {
 
 		it('should update the value when the pointer is clicked and dragged (mouse)', function() {
 			var pointer = $(element).find('.pointer');
+			var slider = $(element).find('input');
 
 			// click and drag
-			pointer.trigger($.Event('mousedown',{clientX: 250}));
-			$(document).trigger($.Event('mousedown',{clientX: 250}));
-			$(document).trigger($.Event('mousemove',{clientX: 125}));
-			$(document).trigger($.Event('mouseup',{clientX: 125}));
+			slider.trigger($.Event('mousedown',{clientX: 250}));
+			slider.trigger($.Event('mousemove',{clientX: 125}));
+			slider.trigger($.Event('mouseup',{clientX: 125}));
 
 			expect($rootScope.skill.value).toBe(1.5);
 			expect(pointer.css('left')).toBe('125px');
@@ -74,12 +75,12 @@ describe("Unit: Slider Directive", function() {
 
 		it('should update the value when the pointer is tapped and slid (touch)', function() {
 			var pointer = $(element).find('.pointer');
+			var slider = $(element).find('input');
 
 			// tap and slide
-			pointer.trigger($.Event('touchstart',{clientX: 250}));
-			$(document).trigger($.Event('touchstart',{clientX: 250}));
-			$(document).trigger($.Event('touchmove',{clientX: 125}));
-			$(document).trigger($.Event('touchend',{clientX: 125}));
+			slider.trigger($.Event('touchstart',{clientX: 250}));
+			slider.trigger($.Event('touchmove',{clientX: 125}));
+			slider.trigger($.Event('touchend',{clientX: 125}));
 
 			expect($rootScope.skill.value).toBe(1.5);
 			expect(pointer.css('left')).toBe('125px');
@@ -89,7 +90,7 @@ describe("Unit: Slider Directive", function() {
 		it('should update the value when the bar is clicked', function() {
 
 			// click the bar
-			$(element).find('.bar').trigger($.Event('mousedown',{ clientX: 375 }));
+			$(element).find('input').trigger($.Event('mousedown',{ clientX: 375 }));
 
 			expect($rootScope.skill.value).toBe(2.5);
 			expect(element.find('.pointer').css('left')).toBe('375px');
@@ -99,12 +100,12 @@ describe("Unit: Slider Directive", function() {
 
 		it('should respect the step', function() {
 			var pointer = $(element).find('.pointer');
+			var slider = $(element).find('input');
 
 			// click and drag
-			pointer.trigger($.Event('mousedown',{clientX: 250}));
-			$(document).trigger($.Event('mousedown',{clientX: 250}));
-			$(document).trigger($.Event('mousemove',{clientX: 200}));
-			$(document).trigger($.Event('mouseup',{clientX: 200}));
+			slider.trigger($.Event('mousedown',{clientX: 250}));
+			slider.trigger($.Event('mousemove',{clientX: 200}));
+			slider.trigger($.Event('mouseup',{clientX: 200}));
 
 			expect($rootScope.skill.value).toBe(1.75);
 			expect(pointer.css('left')).toBe('187.5px');
@@ -166,6 +167,12 @@ describe("Unit: Slider Directive", function() {
 			expect($(pointers[0]).css('left')).toBe('125px');
 			expect(pointers.eq(1)).toHaveClass('high');
 			expect($(pointers[1]).css('left')).toBe('375px');
+			
+			var inputs = element.find('input');
+			expect(inputs.length).toEqual(3);
+			expect(inputs.eq(0)).toHaveClass('low');
+			expect(inputs.eq(1)).toHaveClass('high');
+			expect(inputs.eq(2)).toHaveClass('selection');
 
 			var bubbles = element.find('.bubble');
 			expect(bubbles.length).toEqual(6);
@@ -176,12 +183,12 @@ describe("Unit: Slider Directive", function() {
 
 		it('should update the value when the low pointer is clicked and dragged (mouse)', function() {
 			var pointer = $(element).find('.pointer.low');
+			var slider = $(element).find('.input.low');
 
 			// click and drag
-			pointer.trigger($.Event('mousedown',{clientX: 125}));
-			$(document).trigger($.Event('mousedown',{clientX: 125}));
-			$(document).trigger($.Event('mousemove',{clientX: 250}));
-			$(document).trigger($.Event('mouseup',{clientX: 250}));
+			slider.trigger($.Event('mousedown',{clientX: 125}));
+			slider.trigger($.Event('mousemove',{clientX: 250}));
+			slider.trigger($.Event('mouseup',{clientX: 250}));
 
 			$rootScope.$digest();
 
@@ -192,12 +199,12 @@ describe("Unit: Slider Directive", function() {
 
 		it('should update the value when the low pointer is tapped and slid (touch)', function() {
 			var pointer = $(element).find('.pointer.low');
+			var slider = $(element).find('.input.low');
 
 			// tap and slide
-			pointer.trigger($.Event('touchstart',{clientX: 125}));
-			$(document).trigger($.Event('touchstart',{clientX: 125}));
-			$(document).trigger($.Event('touchmove',{clientX: 250}));
-			$(document).trigger($.Event('touchend',{clientX: 250}));
+			slider.trigger($.Event('touchstart',{clientX: 125}));
+			slider.trigger($.Event('touchmove',{clientX: 250}));
+			slider.trigger($.Event('touchend',{clientX: 250}));
 
 			$rootScope.$digest();
 
@@ -208,12 +215,12 @@ describe("Unit: Slider Directive", function() {
 
 		it('should update the value when the high pointer is clicked and dragged (mouse)', function() {
 			var pointer = $(element).find('.pointer.high');
+			var slider = $(element).find('.input.high');
 
 			// click and drag
-			pointer.trigger($.Event('mousedown',{clientX: 375}));
-			$(document).trigger($.Event('mousedown',{clientX: 375}));
-			$(document).trigger($.Event('mousemove',{clientX: 250}));
-			$(document).trigger($.Event('mouseup',{clientX: 250}));
+			slider.trigger($.Event('mousedown',{clientX: 375}));
+			slider.trigger($.Event('mousemove',{clientX: 250}));
+			slider.trigger($.Event('mouseup',{clientX: 250}));
 
 			$rootScope.$digest();
 
@@ -224,12 +231,12 @@ describe("Unit: Slider Directive", function() {
 
 		it('should update the value when the high pointer is tapped and slid (touch)', function() {
 			var pointer = $(element).find('.pointer.high');
+			var slider = $(element).find('.input.high');
 
 			// tap and slide
-			pointer.trigger($.Event('touchstart',{clientX: 375}));
-			$(document).trigger($.Event('touchstart',{clientX: 375}));
-			$(document).trigger($.Event('touchmove',{clientX: 250}));
-			$(document).trigger($.Event('touchend',{clientX: 250}));
+			slider.trigger($.Event('touchstart',{clientX: 375}));
+			slider.trigger($.Event('touchmove',{clientX: 250}));
+			slider.trigger($.Event('touchend',{clientX: 250}));
 
 			$rootScope.$digest();
 
@@ -240,12 +247,12 @@ describe("Unit: Slider Directive", function() {
 
 		it('should respect the buffer', function() {
 			var pointer = $(element).find('.pointer.low');
+			var slider = $(element).find('.input.low');
 
 			// click and drag
-			pointer.trigger($.Event('mousedown',{clientX: 125}));
-			$(document).trigger($.Event('mousedown',{clientX: 125}));
-			$(document).trigger($.Event('mousemove',{clientX: 375}));
-			$(document).trigger($.Event('mouseup',{clientX: 375}));
+			slider.trigger($.Event('mousedown',{clientX: 125}));
+			slider.trigger($.Event('mousemove',{clientX: 375}));
+			slider.trigger($.Event('mouseup',{clientX: 375}));
 
 			$rootScope.$digest();
 
@@ -255,14 +262,14 @@ describe("Unit: Slider Directive", function() {
 
 		it('should update both values when the selection bar is clicked and dragged (mouse)', function() {
 			var pointer = $(element).find('.bar.selection');
+			var slider = $(element).find('.input.selection');
 
 			var diff = $rootScope.skill.values.high - $rootScope.skill.values.low;
 
 			// click and drag
-			pointer.trigger($.Event('mousedown',{clientX: 250}));
-			$(document).trigger($.Event('mousedown',{clientX: 250}));
-			$(document).trigger($.Event('mousemove',{clientX: 125}));
-			$(document).trigger($.Event('mouseup',{clientX: 125}));
+			slider.trigger($.Event('mousedown',{clientX: 250}));
+			slider.trigger($.Event('mousemove',{clientX: 125}));
+			slider.trigger($.Event('mouseup',{clientX: 125}));
 
 			$rootScope.$digest();
 
@@ -274,16 +281,16 @@ describe("Unit: Slider Directive", function() {
 			expect($(element).find('.pointer.high').css('left')).toBe('250px');
 		});
 
-		it('should update both values when the selection bar is tapped and slid (mouse)', function() {
+		it('should update both values when the selection bar is tapped and slid (touch)', function() {
 			var pointer = $(element).find('.bar.selection');
+			var slider = $(element).find('.input.selection');
 
 			var diff = $rootScope.skill.values.high - $rootScope.skill.values.low;
 
 			// click and drag
-			pointer.trigger($.Event('touchstart',{clientX: 250}));
-			$(document).trigger($.Event('touchstart',{clientX: 250}));
-			$(document).trigger($.Event('touchmove',{clientX: 125}));
-			$(document).trigger($.Event('touchend',{clientX: 125}));
+			slider.trigger($.Event('touchstart',{clientX: 250}));
+			slider.trigger($.Event('touchmove',{clientX: 125}));
+			slider.trigger($.Event('touchend',{clientX: 125}));
 
 			$rootScope.$digest();
 
@@ -298,7 +305,7 @@ describe("Unit: Slider Directive", function() {
 		it('should update the value when the low unselection bar is clicked', function() {
 
 			// click the bar
-			$(element).find('.bar.unselected.low').trigger($.Event('mousedown',{ clientX: 62 }));
+			$(element).find('.input.low').trigger($.Event('mousedown',{ clientX: 62 }));
 
 			expect($rootScope.skill.values.low).toBe(1.25);
 			expect(element.find('.pointer.low').css('left')).toBe('62.5px');
@@ -309,7 +316,7 @@ describe("Unit: Slider Directive", function() {
 		it('should update the value when the high unselection bar is clicked', function() {
 
 			// click the bar
-			$(element).find('.bar.unselected.high').trigger($.Event('mousedown',{ clientX: 437.5 }));
+			$(element).find('.input.high').trigger($.Event('mousedown',{ clientX: 437.5 }));
 
 			expect($rootScope.skill.values.high).toBe(2.75);
 			expect(element.find('.pointer.high').css('left')).toBe('437.5px');

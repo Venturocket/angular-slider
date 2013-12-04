@@ -14,6 +14,7 @@ module.exports = function(config){
             //libraries
             'lib/*.js',
             'app/components/angular/angular.js',
+			'app/components/angular-touch/angular-touch.js',
             'app/components/angular-mocks/angular-mocks.js',
 
             //our directive(s)
