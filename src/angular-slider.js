@@ -322,7 +322,7 @@ angular.module('vr.directives.slider',['ngTouch'])
 									offset(maxPtr, percentToOffset(newHighPercent));
 									offset(highBub, percentToOffset(percentFromOffset(offsetLeft(maxPtr) - halfWidth(highBub) + pointerHalfWidth)));
 									ptrWidthPercent = percentFromOffset(pointerHalfWidth + minOffset);
-									offset(selBar, percentToOffset(newLowPercent));
+									offset(selBar, percentToOffset(newLowPercent + ptrWidthPercent));
 									selBar.css({
 										width: percentToOffset(newHighPercent - newLowPercent)
 									});
@@ -332,9 +332,9 @@ angular.module('vr.directives.slider',['ngTouch'])
 									});
 									unSelBarLow.css({
 										left : 0,
-										width: percentToOffset(newLowPercent)
+										width: percentToOffset(newLowPercent + ptrWidthPercent)
 									});
-									offset(unSelBarHigh, percentToOffset(newHighPercent));
+									offset(unSelBarHigh, percentToOffset(newHighPercent + ptrWidthPercent));
 									unSelBarHigh.css({
 										right: 0
 									});
@@ -591,6 +591,7 @@ angular.module('vr.directives.slider',['ngTouch'])
 							scope.$watch(w, updateDOM);
 						}
 						angular.element(window).bind("resize", updateDOM);
+						scope.$on('refreshSlider', function() { $timeout(updateDOM); });
 					}
 				};
 			}

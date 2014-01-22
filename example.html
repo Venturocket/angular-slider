@@ -88,8 +88,8 @@
 <body id='ng-app' ng-app="ExampleApp">
 
 	<div id='slider-container' ng-controller="MainCtrl">
-	    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' buffer='{{ buffer }}' stretch='{{ stretch }}' ng-model-low='values.low' ng-model-high='values.high' translate='translate'></slider>
-	    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' stretch='{{ stretch }}' ng-model='value'></slider>
+	    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' buffer='{{ buffer }}' stretch='{{ stretch }}' ng-model-low='values.low' ng-model-high='values.high' translate='translate' style="width: {{ sliderWidth }};"></slider>
+	    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' stretch='{{ stretch }}' ng-model='value' style="width: {{ sliderWidth }};"></slider>
 		Floor: <input type='text' ng-model='floor' ng-init='floor = 1' /><br/>
 		Ceiling: <input type='text' ng-model='ceiling' ng-init='ceiling = 10' /><br/>
 		Step Width: <input type='text' ng-model='step' ng-init='step = 1' /><br/>
@@ -97,7 +97,8 @@
 		Buffer: <input type='text' ng-model='buffer' ng-init='buffer = 2' /><br/>
 		Stretch Resistance: <input type='text' ng-model='stretch' ng-init='stretch = 3' /><br/>
 		Values: <input ng-model="values.low" type="text" /><input ng-model="values.high" type="text" /> <br />
-		Value: <input ng-model="value" type="text" />
+		Value: <input ng-model="value" type="text" /> <br />
+		Slider Width: <input type="text" ng-model="sliderWidth" ng-init="sliderWidth = '500px'" ng-change="fireResizeEvent()" />
     </div>
 	<script src="lib/modernizr.custom.72715.js"></script>
 	<script src="app/components/angular/angular.js"></script>
@@ -124,6 +125,10 @@
 				    return '$'+value;
 			    };
 			    doc = $document;
+			        
+			    $scope.fireResizeEvent = function() {
+				    $scope.$broadcast('refreshSlider');
+			    };
 			}]);
     </script>
 </body>
