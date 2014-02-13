@@ -1,12 +1,16 @@
 angular.module('vr.directives.slider',['ngTouch'])
 	.directive('slider', ['$timeout', '$document', '$interpolate', '$swipe', function($timeout, $document, $interpolate, $swipe) {
-		var angularize, bindHtml, gap, halfWidth, hide, offset, offsetLeft, pixelize, roundStep, stepBuffer, expression, show, width, STRETCH_RESISTANCE, startSymbol, endSymbol;
+		var angularize, bindHtml, gap, halfWidth, hide, offset, offsetLeft, pixelize, roundStep, stepBuffer, expression, show, width, STRETCH_RESISTANCE, startSymbol, endSymbol, detectRange;
 
 		STRETCH_RESISTANCE = 3;
 		
 		startSymbol = $interpolate.startSymbol();
 		endSymbol = $interpolate.endSymbol();
-
+		detectRange = function() {
+			var el = document.createElement("input");
+			el.setAttribute('type', 'range');
+			return el.type !== 'text';
+		};
 		angularize = function(element) {
 			return angular.element(element);
 		};
@@ -111,7 +115,7 @@ angular.module('vr.directives.slider',['ngTouch'])
 					attributes.$set('translate', "" + attributes.translate + "(value)");
 				}
 				range = (attributes.ngModel == null) && ((attributes.ngModelLow != null) && (attributes.ngModelHigh != null));
-				inputs = Modernizr.inputtypes.range || false;
+				inputs = detectRange();
 				_ref = (function() {
 					var _i, _len, _ref, _results;
 
