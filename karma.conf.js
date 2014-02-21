@@ -12,13 +12,14 @@ module.exports = function(config){
 
         files: [
             //libraries
-            'lib/*.js',
+            'lib/jquery-2.0.3.min.js',
             'app/components/angular/angular.js',
 			'app/components/angular-touch/angular-touch.js',
             'app/components/angular-mocks/angular-mocks.js',
 
             //our directive(s)
-            'src/*.js',
+            'src/rangeInputSupported.js',
+            'src/angular-slider.js',
 
             //tests
             'test/*.js'

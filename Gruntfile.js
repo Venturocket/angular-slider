@@ -3,7 +3,8 @@ module.exports = function(grunt){
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         srcFiles: [
-            'src/*.js'
+            'src/rangeInputSupported.js',
+            'src/angular-slider.js'
         ],
         concat: {
             prod: {

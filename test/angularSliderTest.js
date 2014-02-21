@@ -18,7 +18,7 @@ describe("Unit: Slider Directive", function() {
 	describe('without sliders and', function() {
 		
 		beforeEach(function() {
-			Modernizr = { inputtypes: { range: false }};
+			AngularSlider = { rangeInputs: false };
 		});
 		
 		describe('with non-range data', function() {
@@ -121,7 +121,7 @@ describe("Unit: Slider Directive", function() {
 		describe('with range data', function() {
 
 			beforeEach(function() {
-				Modernizr = { inputtypes: { range: false }};
+				AngularSlider = { rangeInputs: false };
 				$rootScope.skill = {
 					floor: 1,
 					ceiling: 3,
@@ -329,7 +329,7 @@ describe("Unit: Slider Directive", function() {
 	describe('with sliders and', function() {
 		
 		beforeEach(function() {
-			Modernizr = { inputtypes: { range: true }};
+			AngularSlider = { rangeInputs: true };
 		});
 		
 		describe('with non-range data', function() {

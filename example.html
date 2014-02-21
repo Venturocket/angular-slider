@@ -100,9 +100,9 @@
 		Value: <input ng-model="value" type="text" /> <br />
 		Slider Width: <input type="text" ng-model="sliderWidth" ng-init="sliderWidth = '500px'" ng-change="fireResizeEvent()" />
     </div>
-	<script src="lib/modernizr.custom.72715.js"></script>
 	<script src="app/components/angular/angular.js"></script>
 	<script src="app/components/angular-touch/angular-touch.js"></script>
+    <script src="src/rangeInputSupported.js"></script>
     <script src="src/angular-slider.js"></script>
     <script>
 	    function dump(obj) {
