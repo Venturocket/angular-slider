@@ -1,3 +1,9 @@
+/*
+ angular-slider
+ (c) 2013-2014 Venturocket, Inc. http://github.com/Venturocket
+ License: MIT
+ */
+
 angular.module('vr.directives.slider',['ngTouch'])
 	.directive('slider', ['$timeout', '$document', '$interpolate', '$swipe', function($timeout, $document, $interpolate, $swipe) {
 		var angularize, bindHtml, gap, halfWidth, hide, offset, offsetLeft, pixelize, roundStep, stepBuffer, expression, show, width, STRETCH_RESISTANCE, startSymbol, endSymbol;
