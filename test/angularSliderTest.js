@@ -15,27 +15,23 @@ describe("Unit: Slider Directive", function() {
 		$document = _$document_;
 	}));
 	
-	describe('without sliders and', function() {
+	describe('without range inputs and', function() {
 		
 		beforeEach(function() {
 			AngularSlider = { rangeInputs: false };
 		});
 		
-		describe('with non-range data', function() {
+		describe('non-range data', function() {
 
 			beforeEach(function() {
 				$rootScope.skill = {
-					floor: 1,
-					ceiling: 3,
-					step: 0.25,
-					precision: 2,
 					value: 1,
 					translate: function(value) {
 						return '#'+value+'%';
 					}
 				};
 				spyOn($rootScope.skill,'translate').andCallThrough();
-				element = $compile("<slider floor='{{ skill.floor }}' ceiling='{{ skill.ceiling }}' step='{{ skill.step }}' precision='{{ skill.precision }}' translate='skill.translate' ng-model='skill.value'></slider>")($rootScope);
+				element = $compile("<slider floor='1' ceiling='3' step='0.25' precision='2' translate='skill.translate' ng-model='skill.value'></slider>")($rootScope);
 				$rootScope.$digest();
 				$(element).find('span').css({'display':'block','position':'absolute'});
 				$(element).find('.bar').width(500);
@@ -118,27 +114,19 @@ describe("Unit: Slider Directive", function() {
 			});
 
 		});
-		describe('with range data', function() {
+		describe('range data', function() {
 
 			beforeEach(function() {
 				AngularSlider = { rangeInputs: false };
 				$rootScope.skill = {
-					floor: 1,
-					ceiling: 3,
-					step: 0.25,
-					buffer:0.5,
-					stretch: 4,
-					precision: 3,
-					values: {
-						low: 2,
-						high: 2.5
-					}
+					low: 2,
+                    high: 2.5
 				};
-				element = $compile("<slider floor='{{ skill.floor }}' ceiling='{{ skill.ceiling }}' step='{{ skill.step }}' buffer='{{ skill.buffer }}' precision='{{ skill.precision }}' ng-model-low='skill.values.low' ng-model-high='skill.values.high'></slider>")($rootScope);
+				element = $compile("<slider floor='1' ceiling='3' step='0.25' buffer='0.5' precision='3' ng-model-low='skill.low' ng-model-high='skill.high'></slider>")($rootScope);
 				$rootScope.$digest();
 				$(element).find('span').css({'display':'block','position':'absolute'});
 				$(element).find('.bar.full').width(500);
-				$rootScope.$apply(function() { $rootScope.skill.values.low = 1.5; });
+				$rootScope.$apply(function() { $rootScope.skill.low = 1.5; });
 			});
 	
 	
@@ -191,7 +179,7 @@ describe("Unit: Slider Directive", function() {
 	
 				$rootScope.$digest();
 	
-				expect($rootScope.skill.values.low).toBe(2);
+				expect($rootScope.skill.low).toBe(2);
 				expect(pointer.css('left')).toBe('250px');
 				expect(element.find('.bubble.low').text()).toBe('2.000');
 			});
@@ -207,7 +195,7 @@ describe("Unit: Slider Directive", function() {
 	
 				$rootScope.$digest();
 	
-				expect($rootScope.skill.values.low).toBe(2);
+				expect($rootScope.skill.low).toBe(2);
 				expect(pointer.css('left')).toBe('250px');
 				expect(element.find('.bubble.low').text()).toBe('2.000');
 			});
@@ -223,7 +211,7 @@ describe("Unit: Slider Directive", function() {
 	
 				$rootScope.$digest();
 	
-				expect($rootScope.skill.values.high).toBe(2);
+				expect($rootScope.skill.high).toBe(2);
 				expect(pointer.css('left')).toBe('250px');
 				expect(element.find('.bubble.high').text()).toBe('2.000');
 			});
@@ -239,7 +227,7 @@ describe("Unit: Slider Directive", function() {
 	
 				$rootScope.$digest();
 	
-				expect($rootScope.skill.values.high).toBe(2);
+				expect($rootScope.skill.high).toBe(2);
 				expect(pointer.css('left')).toBe('250px');
 				expect(element.find('.bubble.high').text()).toBe('2.000');
 			});
@@ -255,14 +243,14 @@ describe("Unit: Slider Directive", function() {
 	
 				$rootScope.$digest();
 	
-				expect($rootScope.skill.values.low).toBe(2);
+				expect($rootScope.skill.low).toBe(2);
 				expect(pointer.css('left')).toBe('250px');
 			});
 	
 			it('should update both values when the selection bar is clicked and dragged (mouse)', function() {
 				var pointer = $(element).find('.bar.selection');
 	
-				var diff = $rootScope.skill.values.high - $rootScope.skill.values.low;
+				var diff = $rootScope.skill.high - $rootScope.skill.low;
 	
 				// click and drag
 				pointer.trigger($.Event('mousedown',{clientX: 250}));
@@ -272,18 +260,18 @@ describe("Unit: Slider Directive", function() {
 	
 				$rootScope.$digest();
 	
-				expect($rootScope.skill.values.high - $rootScope.skill.values.low).toBe(diff);
+				expect($rootScope.skill.high - $rootScope.skill.low).toBe(diff);
 	
-				expect($rootScope.skill.values.low).toBe(1);
+				expect($rootScope.skill.low).toBe(1);
 				expect($(element).find('.pointer.low').css('left')).toBe('0px');
-				expect($rootScope.skill.values.high).toBe(2);
+				expect($rootScope.skill.high).toBe(2);
 				expect($(element).find('.pointer.high').css('left')).toBe('250px');
 			});
 	
 			it('should update both values when the selection bar is tapped and slid (mouse)', function() {
 				var pointer = $(element).find('.bar.selection');
 	
-				var diff = $rootScope.skill.values.high - $rootScope.skill.values.low;
+				var diff = $rootScope.skill.high - $rootScope.skill.low;
 	
 				// click and drag
 				pointer.trigger($.Event('touchstart',{clientX: 250}));
@@ -293,11 +281,11 @@ describe("Unit: Slider Directive", function() {
 	
 				$rootScope.$digest();
 	
-				expect($rootScope.skill.values.high - $rootScope.skill.values.low).toBe(diff);
+				expect($rootScope.skill.high - $rootScope.skill.low).toBe(diff);
 	
-				expect($rootScope.skill.values.low).toBe(1);
+				expect($rootScope.skill.low).toBe(1);
 				expect($(element).find('.pointer.low').css('left')).toBe('0px');
-				expect($rootScope.skill.values.high).toBe(2);
+				expect($rootScope.skill.high).toBe(2);
 				expect($(element).find('.pointer.high').css('left')).toBe('250px');
 			});
 	
@@ -306,7 +294,7 @@ describe("Unit: Slider Directive", function() {
 				// click the bar
 				$(element).find('.bar.unselected.low').trigger($.Event('mousedown',{ clientX: 62 }));
 	
-				expect($rootScope.skill.values.low).toBe(1.25);
+				expect($rootScope.skill.low).toBe(1.25);
 				expect(element.find('.pointer.low').css('left')).toBe('62.5px');
 				expect(element.find('.bubble.low').text()).toBe('1.250');
 	
@@ -317,7 +305,7 @@ describe("Unit: Slider Directive", function() {
 				// click the bar
 				$(element).find('.bar.unselected.high').trigger($.Event('mousedown',{ clientX: 437.5 }));
 	
-				expect($rootScope.skill.values.high).toBe(2.75);
+				expect($rootScope.skill.high).toBe(2.75);
 				expect(element.find('.pointer.high').css('left')).toBe('437.5px');
 				expect(element.find('.bubble.high').text()).toBe('2.750');
 	
@@ -326,27 +314,23 @@ describe("Unit: Slider Directive", function() {
 		});
 	});
 
-	describe('with sliders and', function() {
+	describe('with range inputs and', function() {
 		
 		beforeEach(function() {
 			AngularSlider = { rangeInputs: true };
 		});
 		
-		describe('with non-range data', function() {
+		describe('non-range data', function() {
 
 			beforeEach(function() {
 				$rootScope.skill = {
-					floor: 1,
-					ceiling: 3,
-					step: 0.25,
-					precision: 2,
 					value: 1,
 					translate: function(value) {
 						return '#'+value+'%';
 					}
 				};
 				spyOn($rootScope.skill,'translate').andCallThrough();
-				element = $compile("<slider floor='{{ skill.floor }}' ceiling='{{ skill.ceiling }}' step='{{ skill.step }}' precision='{{ skill.precision }}' translate='skill.translate' ng-model='skill.value'></slider>")($rootScope);
+				element = $compile("<slider floor='1' ceiling='3' step='0.25' precision='2' translate='skill.translate' ng-model='skill.value'></slider>")($rootScope);
 				$rootScope.$digest();
 				$(element).find('span').css({'display':'block','position':'absolute'});
 				$(element).find('.bar').width(500);
@@ -431,26 +415,18 @@ describe("Unit: Slider Directive", function() {
 
 		});
 	
-		describe('with range data', function() {
+		describe('range data', function() {
 
 			beforeEach(function() {
 				$rootScope.skill = {
-					floor: 1,
-					ceiling: 3,
-					step: 0.25,
-					buffer:0.5,
-					stretch: 4,
-					precision: 3,
-					values: {
-						low: 2,
-						high: 2.5
-					}
+					low: 2,
+                    high: 2.5
 				};
-				element = $compile("<slider floor='{{ skill.floor }}' ceiling='{{ skill.ceiling }}' step='{{ skill.step }}' buffer='{{ skill.buffer }}' precision='{{ skill.precision }}' ng-model-low='skill.values.low' ng-model-high='skill.values.high'></slider>")($rootScope);
+				element = $compile("<slider floor='1' ceiling='3' step='0.25' buffer='0.5' precision='3' ng-model-low='skill.low' ng-model-high='skill.high'></slider>")($rootScope);
 				$rootScope.$digest();
 				$(element).find('span').css({'display':'block','position':'absolute'});
 				$(element).find('.bar.full').width(500);
-				$rootScope.$apply(function() { $rootScope.skill.values.low = 1.5; });
+				$rootScope.$apply(function() { $rootScope.skill.low = 1.5; });
 			});
 	
 	
@@ -509,7 +485,7 @@ describe("Unit: Slider Directive", function() {
 	
 				$rootScope.$digest();
 	
-				expect($rootScope.skill.values.low).toBe(2);
+				expect($rootScope.skill.low).toBe(2);
 				expect(pointer.css('left')).toBe('250px');
 				expect(element.find('.bubble.low').text()).toBe('2.000');
 			});
@@ -525,7 +501,7 @@ describe("Unit: Slider Directive", function() {
 	
 				$rootScope.$digest();
 	
-				expect($rootScope.skill.values.low).toBe(2);
+				expect($rootScope.skill.low).toBe(2);
 				expect(pointer.css('left')).toBe('250px');
 				expect(element.find('.bubble.low').text()).toBe('2.000');
 			});
@@ -541,7 +517,7 @@ describe("Unit: Slider Directive", function() {
 	
 				$rootScope.$digest();
 	
-				expect($rootScope.skill.values.high).toBe(2);
+				expect($rootScope.skill.high).toBe(2);
 				expect(pointer.css('left')).toBe('250px');
 				expect(element.find('.bubble.high').text()).toBe('2.000');
 			});
@@ -557,7 +533,7 @@ describe("Unit: Slider Directive", function() {
 	
 				$rootScope.$digest();
 	
-				expect($rootScope.skill.values.high).toBe(2);
+				expect($rootScope.skill.high).toBe(2);
 				expect(pointer.css('left')).toBe('250px');
 				expect(element.find('.bubble.high').text()).toBe('2.000');
 			});
@@ -573,7 +549,7 @@ describe("Unit: Slider Directive", function() {
 	
 				$rootScope.$digest();
 	
-				expect($rootScope.skill.values.low).toBe(2);
+				expect($rootScope.skill.low).toBe(2);
 				expect(pointer.css('left')).toBe('250px');
 			});
 	
@@ -581,7 +557,7 @@ describe("Unit: Slider Directive", function() {
 				var pointer = $(element).find('.bar.selection');
 				var slider = $(element).find('.input.selection');
 	
-				var diff = $rootScope.skill.values.high - $rootScope.skill.values.low;
+				var diff = $rootScope.skill.high - $rootScope.skill.low;
 	
 				// click and drag
 				slider.trigger($.Event('mousedown',{clientX: 250}));
@@ -590,11 +566,11 @@ describe("Unit: Slider Directive", function() {
 	
 				$rootScope.$digest();
 	
-				expect($rootScope.skill.values.high - $rootScope.skill.values.low).toBe(diff);
+				expect($rootScope.skill.high - $rootScope.skill.low).toBe(diff);
 	
-				expect($rootScope.skill.values.low).toBe(1);
+				expect($rootScope.skill.low).toBe(1);
 				expect($(element).find('.pointer.low').css('left')).toBe('0px');
-				expect($rootScope.skill.values.high).toBe(2);
+				expect($rootScope.skill.high).toBe(2);
 				expect($(element).find('.pointer.high').css('left')).toBe('250px');
 			});
 	
@@ -602,7 +578,7 @@ describe("Unit: Slider Directive", function() {
 				var pointer = $(element).find('.bar.selection');
 				var slider = $(element).find('.input.selection');
 	
-				var diff = $rootScope.skill.values.high - $rootScope.skill.values.low;
+				var diff = $rootScope.skill.high - $rootScope.skill.low;
 	
 				// click and drag
 				slider.trigger($.Event('touchstart',{clientX: 250}));
@@ -611,11 +587,11 @@ describe("Unit: Slider Directive", function() {
 	
 				$rootScope.$digest();
 	
-				expect($rootScope.skill.values.high - $rootScope.skill.values.low).toBe(diff);
+				expect($rootScope.skill.high - $rootScope.skill.low).toBe(diff);
 	
-				expect($rootScope.skill.values.low).toBe(1);
+				expect($rootScope.skill.low).toBe(1);
 				expect($(element).find('.pointer.low').css('left')).toBe('0px');
-				expect($rootScope.skill.values.high).toBe(2);
+				expect($rootScope.skill.high).toBe(2);
 				expect($(element).find('.pointer.high').css('left')).toBe('250px');
 			});
 	
@@ -624,7 +600,7 @@ describe("Unit: Slider Directive", function() {
 				// click the bar
 				$(element).find('.input.low').trigger($.Event('mousedown',{ clientX: 62 }));
 	
-				expect($rootScope.skill.values.low).toBe(1.25);
+				expect($rootScope.skill.low).toBe(1.25);
 				expect(element.find('.pointer.low').css('left')).toBe('62.5px');
 				expect(element.find('.bubble.low').text()).toBe('1.250');
 	
@@ -635,7 +611,7 @@ describe("Unit: Slider Directive", function() {
 				// click the bar
 				$(element).find('.input.high').trigger($.Event('mousedown',{ clientX: 437.5 }));
 	
-				expect($rootScope.skill.values.high).toBe(2.75);
+				expect($rootScope.skill.high).toBe(2.75);
 				expect(element.find('.pointer.high').css('left')).toBe('437.5px');
 				expect(element.find('.bubble.high').text()).toBe('2.750');
 	
@@ -643,5 +619,76 @@ describe("Unit: Slider Directive", function() {
 	
 		});
 	});
+    
+    describe("in an ngRepeat", function() {
+        
+        beforeEach(function() {
+			AngularSlider = { rangeInputs: true };
+            $rootScope.skills = [
+                {
+                    floor: 1,
+                    ceiling: 3,
+                    value: 1.5,
+                    precision: 2
+                },
+                {
+                    floor: 1,
+                    ceiling: 3,
+                    value: 1.5,
+                    precision: 2
+                }
+            ];
+            element = $compile(
+                "<div><div ng-repeat='skill in skills'>" +
+                    "<slider id='slider{{ $index+1 }}' floor='{{ skill.floor }}' ceiling='{{ skill.ceiling }}' precision='{{ skill.precision }}' ng-model='skill.value'></slider>" +
+                "</div></div>")($rootScope);
+            $rootScope.$digest();
+            $(element).find('span').css({'display':'block','position':'absolute'});
+            $(element).find('.bar.full').width(400);
+            $rootScope.$apply(function() { $rootScope.skills[0].value = 2; });
+        });
+        
+        it('should only move the first slider', function() {
+            
+            var slider = $(element).find('#slider1');
+            var input = slider.find(".input.low");
+	
+            // click the first slider
+            input.trigger($.Event('mousedown',{ clientX: 300 }));
+            
+            expect($rootScope.skills[0].value).toBe(2.50);
+            expect(slider.find('.pointer.low').css('left')).toBe('300px');
+            expect(slider.find('.bubble.low').text()).toBe('2.50');
+            
+            expect($rootScope.skills[1].value).toBe(1.5);
+            
+        })
+    });
+    
+    describe("with stickiness", function() {
+        
+        beforeEach(function() {
+			AngularSlider = { rangeInputs: true };
+            $rootScope.skill = 1.5;
+            element = $compile("<slider id='slider{{ $index+1 }}' floor='1' ceiling='3' stickiness='4' precision='2' step='0.5' ng-model='skill'></slider>")($rootScope);
+            $rootScope.$digest();
+            $(element).find('span').css({'display':'block','position':'absolute'});
+            $(element).find('.bar.full').width(400);
+            $rootScope.$apply(function() { $rootScope.skill = 2; });
+        });
+        
+        it('should apply some stickiness when dragged', function() {
+            var input = $(element).find(".input.low");
+            
+            input.trigger($.Event('mousedown',{ clientX: 200 }));
+            input.trigger($.Event('mousemove',{ clientX: 245 }));
+            
+            expect($rootScope.skill).toBe(2.00);
+            var left = parseFloat($(element).find('.pointer.low').css('left'));
+            expect(left).toBeLessThan(245);
+            expect(left).toBeGreaterThan(200);
+            expect($(element).find('.bubble.low').text()).toBe('2.00');
+        });
+    });
 
 });

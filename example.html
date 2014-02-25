@@ -88,17 +88,20 @@
 <body id='ng-app' ng-app="ExampleApp">
 
 	<div id='slider-container' ng-controller="MainCtrl">
-	    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' buffer='{{ buffer }}' stretch='{{ stretch }}' ng-model-low='values.low' ng-model-high='values.high' translate='translate' style="width: {{ sliderWidth }};"></slider>
-	    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' stretch='{{ stretch }}' ng-model='value' style="width: {{ sliderWidth }};"></slider>
+		<div ng-repeat="scope in scopes">
+		    <slider id="dual{{ $index }}" floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' buffer='{{ buffer }}' stickiness='{{ stickiness }}' ng-model-low='scope.values.low' ng-model-high='scope.values.high' translate='translate' style="width: {{ sliderWidth }};"></slider>
+		    <slider id="single{{ $index }}" floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' stickiness='{{ stickiness }}' ng-model='scope.value' style="width: {{ sliderWidth }};"></slider>
+			Values: <input ng-model="scope.values.low" type="text" /><input ng-model="scope.values.high" type="text" /> <br />
+			Value: <input ng-model="scope.value" type="text" />
+		</div>
+		<button type="button" ng-click="addScope()">Add Scope</button><br/>
 		Floor: <input type='text' ng-model='floor' ng-init='floor = 1' /><br/>
 		Ceiling: <input type='text' ng-model='ceiling' ng-init='ceiling = 10' /><br/>
 		Step Width: <input type='text' ng-model='step' ng-init='step = 1' /><br/>
 		Precision: <input type='text' ng-model='precision' ng-init='precision = 2' /><br/>
 		Buffer: <input type='text' ng-model='buffer' ng-init='buffer = 2' /><br/>
-		Stretch Resistance: <input type='text' ng-model='stretch' ng-init='stretch = 3' /><br/>
-		Values: <input ng-model="values.low" type="text" /><input ng-model="values.high" type="text" /> <br />
-		Value: <input ng-model="value" type="text" /> <br />
-		Slider Width: <input type="text" ng-model="sliderWidth" ng-init="sliderWidth = '500px'" ng-change="fireResizeEvent()" />
+		Stickiness: <input type='text' ng-model='stickiness' ng-init='stickiness = 3' /><br/>
+		Slider Widths: <input type="text" ng-model="sliderWidth" ng-init="sliderWidth = '500px'" ng-change="fireResizeEvent()" />
     </div>
 	<script src="app/components/angular/angular.js"></script>
 	<script src="app/components/angular-touch/angular-touch.js"></script>
@@ -113,18 +116,23 @@
 		
 		    return out;
 		}
-	    var doc = null;
         angular.module('ExampleApp', ['vr.directives.slider'])
-			.controller('MainCtrl', ['$scope', '$document', function($scope, $document) {
-			    $scope.values = {
-			        low : 4,
-			        high: 7
+			.controller('MainCtrl', ['$scope', function($scope) {
+			    $scope.scopes = [];
+			        
+			    $scope.addScope = function() {
+				    $scope.scopes.push({
+					    values: {
+					        low : 4,
+					        high: 7
+					    },
+					    value: 5
+				    });
 			    };
-			    $scope.value = 5;
+			        
 			    $scope.translate = function(value) {
 				    return '$'+value;
 			    };
-			    doc = $document;
 			        
 			    $scope.fireResizeEvent = function() {
 				    $scope.$broadcast('refreshSlider');
