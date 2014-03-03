@@ -10,8 +10,6 @@
 		position:       relative;
 		height:         30px;
 		width:          500px;
-		margin:         50px 0 50px 100px;
-		vertical-align: middle;
 	}
 
 	slider span.bar {
@@ -88,13 +86,6 @@
 <body id='ng-app' ng-app="ExampleApp">
 
 	<div id='slider-container' ng-controller="MainCtrl">
-		<div ng-repeat="scope in scopes">
-		    <slider id="dual{{ $index }}" floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' buffer='{{ buffer }}' stickiness='{{ stickiness }}' ng-model-low='scope.values.low' ng-model-high='scope.values.high' translate='translate' style="width: {{ sliderWidth }};"></slider>
-		    <slider id="single{{ $index }}" floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' stickiness='{{ stickiness }}' ng-model='scope.value' style="width: {{ sliderWidth }};"></slider>
-			Values: <input ng-model="scope.values.low" type="text" /><input ng-model="scope.values.high" type="text" /> <br />
-			Value: <input ng-model="scope.value" type="text" />
-		</div>
-		<button type="button" ng-click="addScope()">Add Scope</button><br/>
 		Floor: <input type='text' ng-model='floor' ng-init='floor = 1' /><br/>
 		Ceiling: <input type='text' ng-model='ceiling' ng-init='ceiling = 10' /><br/>
 		Step Width: <input type='text' ng-model='step' ng-init='step = 1' /><br/>
@@ -102,6 +93,25 @@
 		Buffer: <input type='text' ng-model='buffer' ng-init='buffer = 2' /><br/>
 		Stickiness: <input type='text' ng-model='stickiness' ng-init='stickiness = 3' /><br/>
 		Slider Widths: <input type="text" ng-model="sliderWidth" ng-init="sliderWidth = '500px'" ng-change="fireResizeEvent()" />
+		<h2>Normal</h2>
+		<h3>Single Knob</h3>
+	    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' stickiness='{{ stickiness }}' ng-model='value' style="width: {{ sliderWidth }};"></slider>
+		Value: <input ng-model="value" type="text" />
+		<h3>Dual Knob</h3>
+	    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' buffer='{{ buffer }}' stickiness='{{ stickiness }}' ng-model-low='values.low' ng-model-high='values.high' translate='translate' style="width: {{ sliderWidth }};"></slider>
+		Values: <input ng-model="values.low" type="text" /><input ng-model="values.high" type="text" />
+		<h2>w/ Scaling functions (y=x^2)</h2>
+		<h3>Single Knob</h3>
+	    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' stickiness='{{ stickiness }}' ng-model='value2' scale='scale' inverse-scale='inverseScale' style="width: {{ sliderWidth }};"></slider>
+		Value: <input ng-model="value2" type="text" />
+		<h3>Dual Knob</h3>
+	    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' buffer='{{ buffer }}' stickiness='{{ stickiness }}' ng-model-low='values2.low' ng-model-high='values2.high' scale='scale' inverse-scale='inverseScale' translate='translate' style="width: {{ sliderWidth }};"></slider>
+		Values: <input ng-model="values2.low" type="text" /><input ng-model="values2.high" type="text" />
+		<h2>in ngRepeat</h2>
+		<div ng-repeat="scope in scopes">
+		    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' stickiness='{{ stickiness }}' ng-model='scope.value' style="width: {{ sliderWidth }};"></slider>
+		</div>
+		<button type="button" ng-click="addScope()">Add Slider</button><br/>
     </div>
 	<script src="app/components/angular/angular.js"></script>
 	<script src="app/components/angular-touch/angular-touch.js"></script>
@@ -119,6 +129,22 @@
         angular.module('ExampleApp', ['vr.directives.slider'])
 			.controller('MainCtrl', ['$scope', function($scope) {
 			    $scope.scopes = [];
+			    $scope.value = 5;
+			    $scope.value2 = 5;
+				$scope.values = {
+				    low: 4,
+				    high: 7
+			    };
+			    $scope.values2 = {
+				    low: 4,
+				    high: 7
+			    };
+			    $scope.scale = function(value) {
+				    return Math.pow(value,2);
+			    };
+			    $scope.inverseScale = function(value) {
+				    return Math.sqrt(value);
+			    };
 			        
 			    $scope.addScope = function() {
 				    $scope.scopes.push({

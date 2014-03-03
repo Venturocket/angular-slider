@@ -5,7 +5,10 @@
     "ignore": [
         "**/.*",
         "node_modules",
-        "components"
+        "components",
+        "lib",
+        "src",
+        "test"
     ],
     "dependencies": {
         "angular": "*",

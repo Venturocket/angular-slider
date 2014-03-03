@@ -40,11 +40,11 @@ describe("Unit: Slider Directive", function() {
 
 
 			it('should create a new non-range slider', function() {
-				expect(element.find('span').length).toBe(5);
+				expect(element.find('span').length).toBe(6);
 
 				// should be only one bar
 				var bar = element.find('.bar');
-				expect(bar.length).toBe(1);
+				expect(bar.length).toBe(2);
 				expect(bar).toHaveClass('full');
 
 				// should be only one pointer, and it should be in the right position
@@ -133,26 +133,29 @@ describe("Unit: Slider Directive", function() {
 			it('should create a new range slider', function() {
 	
 				var bars = $(element).find('.bar');
-				expect(bars.length).toEqual(4);
+				expect(bars.length).toEqual(5);
 	
 				// full bar
 				expect(bars.eq(0)).toHaveClass('full');
+                
+                // steps bar
+                expect(bars.eq(1)).toHaveClass('steps');
 	
 				// selection bar
-				expect(bars.eq(1)).toHaveClass('selection');
-				expect($(bars[1]).css('left')).toBe('125px');
+				expect(bars.eq(2)).toHaveClass('selection');
+				expect($(bars[2]).css('left')).toBe('125px');
 	
 				// low unselection bar
-				expect(bars.eq(2)).toHaveClass('unselected');
-				expect(bars.eq(2)).toHaveClass('low');
-				expect($(bars[2]).css('left')).toBe('0px');
-				expect($(bars[2]).width()).toBe(125);
+				expect(bars.eq(3)).toHaveClass('unselected');
+				expect(bars.eq(3)).toHaveClass('low');
+				expect($(bars[3]).css('left')).toBe('0px');
+				expect($(bars[3]).width()).toBe(125);
 	
 				// high unselection bar
-				expect(bars.eq(3)).toHaveClass('unselected');
-				expect(bars.eq(3)).toHaveClass('high');
-				expect($(bars[3]).css('left')).toBe('375px');
-				expect($(bars[3]).css('right')).toBe('0px');
+				expect(bars.eq(4)).toHaveClass('unselected');
+				expect(bars.eq(4)).toHaveClass('high');
+				expect($(bars[4]).css('left')).toBe('375px');
+				expect($(bars[4]).css('right')).toBe('0px');
 	
 				var pointers = element.find('.pointer');
 				expect(pointers.length).toEqual(2);
@@ -339,12 +342,12 @@ describe("Unit: Slider Directive", function() {
 
 
 			it('should create a new non-range slider', function() {
-				expect(element.find('span').length).toBe(5);
+				expect(element.find('span').length).toBe(6);
 				expect(element.find('input').length).toBe(1);
 
 				// should be only one bar
 				var bar = element.find('.bar');
-				expect(bar.length).toBe(1);
+				expect(bar.length).toBe(2);
 				expect(bar).toHaveClass('full');
 
 				// should be only one pointer, and it should be in the right position
@@ -433,26 +436,29 @@ describe("Unit: Slider Directive", function() {
 			it('should create a new range slider', function() {
 	
 				var bars = $(element).find('.bar');
-				expect(bars.length).toEqual(4);
+				expect(bars.length).toEqual(5);
 	
 				// full bar
 				expect(bars.eq(0)).toHaveClass('full');
+                
+                // steps bar
+                expect(bars.eq(1)).toHaveClass('steps');
 	
 				// selection bar
-				expect(bars.eq(1)).toHaveClass('selection');
-				expect($(bars[1]).css('left')).toBe('125px');
+				expect(bars.eq(2)).toHaveClass('selection');
+				expect($(bars[2]).css('left')).toBe('125px');
 	
 				// low unselection bar
-				expect(bars.eq(2)).toHaveClass('unselected');
-				expect(bars.eq(2)).toHaveClass('low');
-				expect($(bars[2]).css('left')).toBe('0px');
-				expect($(bars[2]).width()).toBe(125);
+				expect(bars.eq(3)).toHaveClass('unselected');
+				expect(bars.eq(3)).toHaveClass('low');
+				expect($(bars[3]).css('left')).toBe('0px');
+				expect($(bars[3]).width()).toBe(125);
 	
 				// high unselection bar
-				expect(bars.eq(3)).toHaveClass('unselected');
-				expect(bars.eq(3)).toHaveClass('high');
-				expect($(bars[3]).css('left')).toBe('375px');
-				expect($(bars[3]).css('right')).toBe('0px');
+				expect(bars.eq(4)).toHaveClass('unselected');
+				expect(bars.eq(4)).toHaveClass('high');
+				expect($(bars[4]).css('left')).toBe('375px');
+				expect($(bars[4]).css('right')).toBe('0px');
 	
 				var pointers = element.find('.pointer');
 				expect(pointers.length).toEqual(2);
@@ -620,6 +626,75 @@ describe("Unit: Slider Directive", function() {
 		});
 	});
     
+    describe("with a scaling function", function() {
+        
+        beforeEach(function() {
+            AngularSlider = { rangeInputs: true };
+            $rootScope.skill = {
+                value: 1.5,
+                values: {
+                    low: 3,
+                    high: 16
+                },
+                sq   : function(value) {
+                    return Math.pow(value, 2);
+                },
+                sqRt : function(value) {
+                    return Math.sqrt(value);
+                }
+            };
+        });
+        
+        describe("and non-range data", function() {
+        
+            beforeEach(function() {
+                element = $compile("<slider floor='1' ceiling='9' precision='2' scale='skill.sq' inverse-scale='skill.sqRt' ng-model='skill.value'></slider>")($rootScope);
+                $rootScope.$digest();
+                $(element).find('span').css({'display':'block','position':'absolute'});
+                $(element).find('.bar.full').width(400);
+                $rootScope.$apply(function() { $rootScope.skill.value = 1; });
+            });
+            
+            it('should scale the value according to a squaring function', function() {
+                var input = $(element).find(".input.low");
+                
+                input.trigger($.Event('mousedown',{ clientX: 0 }));
+                input.trigger($.Event('mousemove',{ clientX: 200 }));
+                input.trigger($.Event('mouseup',{clientX: 200}));
+                
+                expect($rootScope.skill.value).toBe(4.00);
+                expect($(element).find('.bubble.low').text()).toBe('4.00');
+            });
+            
+        });
+        
+        describe("and range data", function() {
+        
+            beforeEach(function() {
+                element = $compile("<slider floor='1' ceiling='25' precision='2' scale='skill.sq' inverse-scale='skill.sqRt' ng-model-low='skill.values.low' ng-model-high='skill.values.high'></slider>")($rootScope);
+                $rootScope.$digest();
+                $(element).find('span').css({'display':'block','position':'absolute'});
+                $(element).find('.bar.full').width(400);
+                $rootScope.$apply(function() { $rootScope.skill.values.low = 4; });
+            });
+            
+            it('should scale the value according to a squaring function', function() {
+                var input = $(element).find(".input.selection");
+                
+                input.trigger($.Event('mousedown',{ clientX: 200 }));
+                input.trigger($.Event('mousemove',{ clientX: 100 }));
+                input.trigger($.Event('mouseup',{clientX: 100}));
+                
+                expect($rootScope.skill.values.low).toBe(1.00);
+                expect($rootScope.skill.values.high).toBe(9.00);
+                
+                expect($(element).find('.bubble.low').text()).toBe('1.00');
+                expect($(element).find('.bubble.high').text()).toBe('9.00');
+            });
+            
+        });
+    });
+    
     describe("in an ngRepeat", function() {
         
         beforeEach(function() {
@@ -670,7 +745,7 @@ describe("Unit: Slider Directive", function() {
         beforeEach(function() {
 			AngularSlider = { rangeInputs: true };
             $rootScope.skill = 1.5;
-            element = $compile("<slider id='slider{{ $index+1 }}' floor='1' ceiling='3' stickiness='4' precision='2' step='0.5' ng-model='skill'></slider>")($rootScope);
+            element = $compile("<slider floor='1' ceiling='3' stickiness='4' precision='2' step='0.5' ng-model='skill'></slider>")($rootScope);
             $rootScope.$digest();
             $(element).find('span').css({'display':'block','position':'absolute'});
             $(element).find('.bar.full').width(400);
