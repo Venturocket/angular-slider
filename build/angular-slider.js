@@ -1,605 +1,1591 @@
+/**
+ * Author: Derek Gould
+ * Date: 2/21/14
+ * Time: 12:40 PM
+ */
+
+/**
+ * Copy of Modernizr's range input type check
+ * @returns {bool}
+ */
+window.AngularSlider = {
+    rangeInputs: (function(doc) {
+        var el = document.createElement("input");
+        el.setAttribute('type', 'range');
+        if(el.type === 'text') {
+            return false;
+        }
+        el.value         = ':)';
+        el.style.cssText = 'position:absolute;visibility:hidden;';
+
+        if (el.style.WebkitAppearance !== undefined ) {
+
+            var docElement = doc.documentElement;
+            var defaultView = doc.defaultView;
+            docElement.appendChild(el);
+
+            // Safari 2-4 allows the smiley as a value, despite making a slider
+            var ret = defaultView.getComputedStyle &&
+                      defaultView.getComputedStyle(el, null).WebkitAppearance !== 'textfield' &&
+                // Mobile android web browser has false positive, so must
+                // check the height to see if the widget is actually there.
+                      (el.offsetHeight !== 0);
+
+            docElement.removeChild(el);
+
+            return ret;
+
+        }
+        return false;
+    })(this.document)
+};
+
+
+
 /*
  angular-slider
  (c) 2013-2014 Venturocket, Inc. http://github.com/Venturocket
  License: MIT
  */
 
-angular.module('vr.directives.slider',['ngTouch'])
-	.directive('slider', ['$timeout', '$document', '$interpolate', '$swipe', function($timeout, $document, $interpolate, $swipe) {
-		var angularize, bindHtml, gap, halfWidth, hide, offset, offsetLeft, pixelize, roundStep, stepBuffer, expression, show, width, STRETCH_RESISTANCE, startSymbol, endSymbol;
+angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
+        ['$timeout', '$document', '$interpolate', '$swipe', function($timeout, $document, $interpolate, $swipe) {
 
-		STRETCH_RESISTANCE = 3;
-		
-		startSymbol = $interpolate.startSymbol();
-		endSymbol = $interpolate.endSymbol();
+            /**
+             * How sticky the knobs feel...ew
+             * @type {number}
+             */
+            var KNOB_STICKINESS = 3;
 
-		angularize = function(element) {
-			return angular.element(element);
-		};
+            /**
+             * You want custom start and end symbols? You can have custom start and end symbols
+             * @type {string}
+             */
+            var startSymbol = $interpolate.startSymbol(), endSymbol = $interpolate.endSymbol();
 
-		pixelize = function(position) {
-			return "" + position + "px";
-		};
+            /**
+             * Convert a regular element to an angular element...Oh fancy! *waves hands*
+             * @param {object} element
+             * @returns {object} the new element
+             */
+            function angularize(element) {
+                return angular.element(element);
+            }
 
-		hide = function(element) {
-			return element.css({
-				opacity: 0
-			});
-		};
+            /**
+             * Adds 'px' to the end of a number...Yes, that's really all it does.
+             * @param {(string|Number)} position
+             * @returns {string}
+             */
+            function pixelize(position) {
+                return "" + position + "px";
+            }
 
-		show = function(element) {
-			return element.css({
-				opacity: 1
-			});
-		};
+            /**
+             * I'm not completely sure what this does, but I have a feeling it has something to do with opacity
+             * @param {object} element
+             * @param {Number} opacity
+             * @returns {object} the element
+             */
+            function setOpacity(element, opacity) {
+                return element.css({
+                    opacity: opacity
+                });
+            }
 
-		offset = function(element, position) {
-			return element.css({
-				left: position
-			});
-		};
+            /**
+             * Sets the element's opacity to 0
+             * @param {object} element
+             * @returns {object} the element
+             */
+            function hide(element) {
+                return setOpacity(element, 0);
+            }
 
-		halfWidth = function(element) {
-			return width(element) / 2;
-		};
+            /**
+             * Sets the element's opacity to 1
+             * @param {object} element
+             * @returns {object} the element
+             */
+            function show(element) {
+                return setOpacity(element, 1);
+            }
 
-		offsetLeft = function(element) {
-			try {return element.offset().left;} catch(e) {}
-			return element[0].getBoundingClientRect().left; // + scrollX;
-		};
+            /**
+             * offsets the element from the left the given amount
+             * @param {object} element
+             * @param {Number|string} position
+             * @returns {object} the element
+             */
+            function offset(element, position) {
+                return element.css({
+                    left: position
+                });
+            }
 
-		width = function(element) {
-			var width = parseFloat(element.css('width'));
-			return isNaN(width) ? element[0].offsetWidth : width;
-		};
+            /**
+             * Determines the width of the element...somehow
+             * @param {object} element
+             * @returns {number}
+             */
+            function width(element) {
+                var width = parseFloat(element.css('width'));
+                return isNaN(width) ? element[0].offsetWidth : width;
+            }
 
-		gap = function(element1, element2) {
-			return offsetLeft(element2) - offsetLeft(element1) - width(element1);
-		};
+            /**
+             * You wouldn't believe me if I told you, but this will tell you how wide half of the given element is!
+             * @param {object} element
+             * @returns {number}
+             */
+            function halfWidth(element) {
+                return width(element) / 2;
+            }
 
-		bindHtml = function(element, html) {
-			return element.attr('ng-bind-template', html);
-		};
+            /**
+             * Determine the amount of space to the left of the element
+             * @param {object} element
+             * @returns {Number}
+             */
+            function offsetLeft(element) {
+                try {return element.offset().left;} catch(e) {}
+                return element[0].getBoundingClientRect().left; // + scrollX;
+            }
 
-		roundStep = function(value, precision, step, floor, ceiling) {
-			var decimals, remainder, roundedValue, steppedValue;
+            /**
+             * Compute the gap between the two given elements
+             * @param {object} element1
+             * @param {object} element2
+             * @returns {number}
+             */
+            function gap(element1, element2) {
+                if(offsetLeft(element1) > offsetLeft(element2)) {
+                    return offsetLeft(element1) - offsetLeft(element2) - width(element2);
+                }
+                return offsetLeft(element2) - offsetLeft(element1) - width(element1);
+            }
 
-			if(step == null || step == 0) {
-				step = 1 / Math.pow(10, precision);
-			}
-			if(floor == null) {
-				floor = 0;
-			}
-			if(value == null || isNaN(value)) {
-				value = 0;
-			}
-			remainder = (value - floor) % step;
-			steppedValue = remainder > (step / 2) ? value + step - remainder : value - remainder;
-			decimals = Math.pow(10, precision);
-			roundedValue = steppedValue * decimals / decimals;
-			if(ceiling == null) {
-				ceiling = roundedValue;
-			}
-			roundedValue = roundedValue < floor ? floor : roundedValue > ceiling ? ceiling : roundedValue;
-			return parseFloat(roundedValue.toFixed(precision));
-		};
+            /**
+             * Binds the given html string to the given element
+             * @param {object} element
+             * @param {string} html
+             * @returns {object} the element
+             */
+            function bindHtml(element, html) {
+                return element.attr('ng-bind-template', html);
+            }
 
-		stepBuffer = function(step, buffer) {
-			if(step > 0 && !isNaN(buffer)) {
-				return Math.ceil(buffer / step) * step;
-			}
-			return buffer;
-		};
-		
-		expression = function(exp) {
-			return startSymbol + " " + exp + " " + endSymbol;
-		};
+            /**
+             * Computes the nearest full step
+             * @param {Number} [value = 0]
+             * @param {Number} [precision = 0]
+             * @param {Number} [step = 1/Math.pow(10, precision)]
+             * @param {Number} [floor = 0]
+             * @param {Number} [ceiling]
+             * @returns {Number}
+             */
+            function roundStep(value, precision, step, floor, ceiling) {
 
-		return {
-			restrict: 'EA',
-			scope   : {
-				floor      : '@',
-				ceiling    : '@',
-				step       : '@',
-				precision  : '@',
-				buffer     : '@',
-				stretch    : '@',
-				ngModel    : '=',
-				ngModelLow : '=',
-				ngModelHigh: '=',
-				translate  : '&'
-			},
-			template: "<span class='bar full'></span><span class='bar selection'></span><span class='bar unselected low'></span><span class='bar unselected high'></span><span class='pointer low'></span><span class='pointer high'></span><span class='bubble low'></span><span class='bubble high'></span><span class='bubble middle'></span><span class='bubble selection'></span><span class='bubble limit floor'></span><span class='bubble limit ceiling'></span><input type='range' class='input low' /><input type='range' class='input high' /><input type='range' class='input selection' />",
-			compile : function(element, attributes) {
-				var ceilBub, cmbBub, e, flrBub, fullBar, highBub, lowBub, maxPtr, minPtr, range, inputs, refHigh, refLow, refSel, selBar, unSelBarLow, unSelBarHigh, selBub, minInput, maxInput, selInput, watchables, _i, _len, _ref, _ref1;
+                // precision is optional
+                if(angular.isUndefined(precision) || !precision) {
+                    precision = 0;
+                }
 
-				if(attributes.translate) {
-					attributes.$set('translate', "" + attributes.translate + "(value)");
-				}
-				range = (attributes.ngModel == null) && ((attributes.ngModelLow != null) && (attributes.ngModelHigh != null));
-				inputs = Modernizr.inputtypes.range || false;
-				_ref = (function() {
-					var _i, _len, _ref, _results;
+                // step is optional
+                if(angular.isUndefined(step) || !step || step == 0) {
+                    step = 1 / Math.pow(10, precision);
+                }
 
-					_ref = element.children();
-					_results = [];
-					for(_i = 0, _len = _ref.length; _i < _len; _i++) {
-						e = _ref[_i];
-						e = angularize(e);
-						e.css({
-							'white-space': 'nowrap',
-							position:    'absolute',
-							display:     'block',
-							'z-index': 1
-						});
-						_results.push(e);
-					}
-					return _results;
-				})(), fullBar = _ref[0], selBar = _ref[1], unSelBarLow = _ref[2], unSelBarHigh = _ref[3], minPtr = _ref[4], maxPtr = _ref[5], 
-					lowBub = _ref[6], highBub = _ref[7], cmbBub = _ref[8], selBub = _ref[9], flrBub = _ref[10], ceilBub = _ref[11], 
-					minInput = _ref[12], maxInput = _ref[13], selInput = _ref[14];
-				
-				fullBar.css({
-					left: 0,
-					right: 0
-				});
-				
-				refLow = range ? 'ngModelLow' : 'ngModel';
-				refHigh = 'ngModelHigh';
-				refSel = 'selectBar';
-				if(inputs) {
-					var inputStyles = {
-						position: 'absolute',
-						margin: 0,
-						padding: 0,
-						opacity: 0,
-						height: '100%'
-					};
-					
-					minInput.attr('step',expression("inputSteps()"));
-					minInput.attr('min',expression("floor"));
-					minInput.css(inputStyles);
-					minInput.css('left',0);
-					if(range) {
-						minInput.attr('max',expression("ngModelHigh - (buffer / 2)"));
-						maxInput.attr('step',expression("inputSteps()"));
-						maxInput.attr('min',expression("ngModelLow + (buffer / 2)"));
-						maxInput.attr('max',expression("ceiling"));
-						maxInput.css(inputStyles);
-						selInput.attr('step',expression("inputSteps()"));
-						selInput.attr('min',expression("ngModelLow"));
-						selInput.attr('max',expression("ngModelHigh"));
-						selInput.css(inputStyles);
-					} else {
-						minInput.attr('max',expression("ceiling"));
-						minInput.css({
-							width: '100%'
-						});
-						maxInput.remove();
-						selInput.remove();
-					}
-				} else {
-					minInput.remove();
-					maxInput.remove();
-					selInput.remove();
-				}
-				bindHtml(ceilBub, expression("translation(ceiling)"));
-				bindHtml(flrBub, expression("translation(floor)"));
-				bindHtml(selBub, "Range: "+expression("translation(diff)"));
-				bindHtml(lowBub, expression("translation(" + refLow + ")"));
-				bindHtml(highBub, expression("translation(" + refHigh + ")"));
-				bindHtml(cmbBub, expression("translation(" + refLow + ")")+" - "+expression("translation(" + refHigh + ")"));
-				if(!range) {
-					_ref1 = [selBar, unSelBarLow, unSelBarHigh, maxPtr, selBub, highBub, cmbBub];
-					for(_i = 0, _len = _ref1.length; _i < _len; _i++) {
-						element = _ref1[_i];
-						element.remove();
-					}
-				}
-				watchables = [refLow, 'floor', 'ceiling'];
-				if(range) {
-					watchables.push(refHigh);
-					watchables.push('buffer');
-				}
-				return {
-					post: function(scope, element, attributes) {
+                // floor is optional
+                if(angular.isUndefined(floor) || !floor) {
+                    floor = 0;
+                }
 
-						scope.translation = function(value) {
-							value = parseFloat(value).toFixed(scope.precision);
-							if(angular.isUndefined(attributes.translate)) {
-								return ''+value;
-							}
-							return scope.translate({value: value});
-						};
-						
-						scope.inputSteps = function() {
-							return Math.pow(10,scope.precision*-1);
-						};
+                // value is optional
+                if(angular.isUndefined(value) || !value) {
+                    value = 0;
+                }
 
-						var barWidth, boundToInputs, dimensions, maxOffset, maxValue, minOffset, minValue, offsetRange, pointerHalfWidth, updateDOM, valueRange, w, _j, _len1, stickyOffsetLow = 0, stickyOffsetHigh = 0;
+                // how far from a step is the value
+                var remainder = (value - floor) % step;
 
-						boundToInputs = false;
-						pointerHalfWidth = barWidth = minOffset = maxOffset = minValue = maxValue = valueRange = offsetRange = void 0;
-						dimensions = function() {
-							var value, _j, _len1, buffer;
+                // round the value to a step
+                var roundedValue = remainder > (step / 2) ? value + step - remainder : value - remainder;
 
-							if(angular.isUndefined(scope.precision)) {
-								scope.precision = 0;
-							}
-							if(angular.isUndefined(scope.step)) {
-								scope.step = 0;
-							}
-							scope.buffer = buffer = stepBuffer(parseFloat(scope.step), parseFloat(scope.buffer));
-							scope.floor = parseFloat(scope.floor);
-							scope.ceiling = parseFloat(scope.ceiling);
-							for(_j = 0, _len1 = watchables.length; _j < _len1; _j++) {
-								value = watchables[_j];
-								if(value == refLow || value == refHigh) {
-									scope[value] = roundStep(parseFloat(scope[value]), parseFloat(scope.precision), parseFloat(scope.step),
-										parseFloat(scope.floor), parseFloat(scope.ceiling));
-								}
-							}
-							if(range && parseFloat(scope[refHigh]) < parseFloat(scope[refLow])) {
-								var temp = scope[refHigh];
-								scope[refHigh] = scope[refLow];
-								scope[refLow] = temp;
-							}
-							if(range) {
-								scope.diff = roundStep(scope[refHigh] - scope[refLow], parseFloat(scope.precision), parseFloat(scope.step));
-								if(buffer > 0 && scope.diff < buffer) {
-									var avg = (parseFloat(scope[refLow]) + parseFloat(scope[refHigh])) / 2;
-									scope[refLow] = roundStep(avg - (buffer / 2), parseFloat(scope.precision), parseFloat(scope.step),
-										parseFloat(scope.floor), parseFloat(scope.ceiling));
-									scope[refHigh] = parseFloat(scope[refLow]) + buffer;
-									if(scope[refHigh] > scope.ceiling) {
-										scope[refLow] -= buffer;
-										scope[refHigh] = scope.ceiling;
-									}
-									scope.diff = buffer;
-								}
-							}
-							pointerHalfWidth = halfWidth(minPtr);
-							barWidth = width(fullBar);
-							minOffset = offsetLeft(fullBar);
-							maxOffset = minOffset + barWidth - width(minPtr);
-							minValue = parseFloat(attributes.floor);
-							maxValue = parseFloat(attributes.ceiling);
-							valueRange = maxValue - minValue;
-							return offsetRange = maxOffset - minOffset;
-						};
-						updateDOM = function() {
-							var adjustBubbles, fitToBar, percentFromOffset, valueOffset, percentToOffset, percentValue, setBindings, setPointers, percentStretch, onEnd, onMove, onStart, dragRange, lowOffset, highOffset, newLow, newHigh, pointer, ref;
-							
-							dimensions();
+                // ceiling is optional
+                if(angular.isUndefined(ceiling) || !ceiling) {
+                    ceiling = roundedValue;
+                }
 
-							offset(flrBub,0);
-							offset(ceilBub,pixelize(barWidth - width(ceilBub)));
+                // bring the value back in range
+                roundedValue = Math.min(Math.max(roundedValue, floor), ceiling);
 
-							percentFromOffset = function(offset) {
-								return ((offset - minOffset) / offsetRange) * 100;
-							};
-							valueOffset = function(value) {
-								return (((value - minValue) / valueRange) * offsetRange) + minOffset;
-							};
-							percentValue = function(value) {
-								return ((value - minValue) / valueRange) * 100;
-							};
-							percentToOffset = function(percent) {
-								return pixelize(percent * offsetRange / 100);
-							};
-							fitToBar = function(element) {
-								return offset(element, percentToOffset(percentFromOffset(Math.min(Math.max(minOffset, offsetLeft(element)), maxOffset))));
-							};
-							percentStretch = function(percent, maxPercent, end) {
-								var sign = percent > 0 ? 1 : -1;
-								maxPercent = maxPercent == 0 ? 100 : maxPercent;
-								if(end) {
-									return (
-										Math.sin(
-											(Math.min(Math.abs(percent / maxPercent), 1) * Math.PI) -
-											(Math.PI / 2)
-										) + 1
-									) * sign * maxPercent / 6;
-								}
-								var stretch = parseInt(scope.stretch) || STRETCH_RESISTANCE;
-								return sign * Math.pow(Math.min(Math.abs(percent / maxPercent * 2), 1), stretch) * maxPercent / 2;
-							};
-							setPointers = function() {
-								var newHighValue, newLowValue, newLowPercent, newHighPercent, maxPercent, bufferPercent, ptrWidthPercent;
+                // set the precision
+                return parseFloat(roundedValue.toFixed(precision));
+            }
 
-								maxPercent = percentValue(parseFloat(scope.step) + minValue);
-								bufferPercent = percentValue(stepBuffer(parseFloat(scope.step), parseFloat(scope.buffer)) + minValue);
+            /**
+             * Rounds the buffer up to the nearest full step
+             * @param {Number} step
+             * @param {Number} buffer
+             * @returns {Number}
+             */
+            function stepBuffer(step, buffer) {
+                if(step > 0 && !isNaN(buffer)) {
+                    return Math.ceil(buffer / step) * step;
+                }
+                return buffer;
+            }
 
-								newLowValue = percentValue(scope[refLow]);
-								newLowPercent = newLowValue + percentStretch(stickyOffsetLow, maxPercent);
-								offset(minPtr, percentToOffset(newLowPercent));
-								offset(lowBub, percentToOffset(percentFromOffset(offsetLeft(minPtr) - halfWidth(lowBub) + pointerHalfWidth)));
-								if(range) {
-									newHighValue = percentValue(scope[refHigh]);
-									if(newLowPercent > newHighValue - bufferPercent) {
-										newLowPercent = newLowValue + percentStretch(stickyOffsetLow, bufferPercent, true);
-										offset(minPtr, percentToOffset(newLowPercent));
-										offset(lowBub, percentToOffset(percentFromOffset(offsetLeft(minPtr) - halfWidth(lowBub) + pointerHalfWidth)));
-									}
-									newHighPercent = newHighValue + percentStretch(stickyOffsetHigh, maxPercent);
-									if(newHighPercent < newLowValue + bufferPercent) {
-										newHighPercent = newHighValue + percentStretch(stickyOffsetHigh, bufferPercent, true);
-									}
-									offset(maxPtr, percentToOffset(newHighPercent));
-									offset(highBub, percentToOffset(percentFromOffset(offsetLeft(maxPtr) - halfWidth(highBub) + pointerHalfWidth)));
-									ptrWidthPercent = percentFromOffset(pointerHalfWidth + minOffset);
-									offset(selBar, percentToOffset(newLowPercent + ptrWidthPercent));
-									selBar.css({
-										width: percentToOffset(newHighPercent - newLowPercent)
-									});
-									selInput.css({
-										left: percentToOffset(newLowPercent + (ptrWidthPercent * 2)),
-										width: percentToOffset(newHighPercent - newLowPercent - (ptrWidthPercent * 2))
-									});
-									unSelBarLow.css({
-										left : 0,
-										width: percentToOffset(newLowPercent + ptrWidthPercent)
-									});
-									offset(unSelBarHigh, percentToOffset(newHighPercent + ptrWidthPercent));
-									unSelBarHigh.css({
-										right: 0
-									});
-									offset(selBub, percentToOffset(newLowPercent + percentFromOffset(halfWidth(selBar) - halfWidth(selBub) + minOffset)));
-									offset(cmbBub, percentToOffset(newLowPercent + percentFromOffset(halfWidth(selBar) - halfWidth(cmbBub) + minOffset)));
-									if(inputs) {
-										minInput.css({
-											width: (newHighPercent - (bufferPercent / 2))+'%'
-										});
-										var maxInputLowPercent = newLowPercent + (bufferPercent / 2); 
-										maxInput.css({
-											left: maxInputLowPercent+'%',
-											width: (100 - maxInputLowPercent)+'%'
-										});
-									}
-								}
-							};
-							adjustBubbles = function() {
-								var bubToAdjust;
+            /**
+             * Wraps the given expression in whatever start and end symbol this app uses
+             * @param {string} exp
+             * @returns {string}
+             */
+            function expression(exp) {
+                return startSymbol + " " + exp + " " + endSymbol;
+            }
 
-								fitToBar(lowBub);
-								bubToAdjust = highBub;
-								if(range) {
-									fitToBar(highBub);
-									fitToBar(selBub);
-									if(gap(lowBub, highBub) < 10) {
-										hide(lowBub);
-										hide(highBub);
-										fitToBar(cmbBub);
-										show(cmbBub);
-										bubToAdjust = cmbBub;
-									} else {
-										show(lowBub);
-										show(highBub);
-										hide(cmbBub);
-										bubToAdjust = highBub;
-									}
-								}
-								if(gap(flrBub, lowBub) < 5) {
-									hide(flrBub);
-								} else {
-									if(range) {
-										if(gap(flrBub, bubToAdjust) < 5) {
-											hide(flrBub);
-										} else {
-											show(flrBub);
-										}
-									} else {
-										show(flrBub);
-									}
-								}
-								if(gap(lowBub, ceilBub) < 5) {
-									return hide(ceilBub);
-								} else {
-									if(range) {
-										if(gap(bubToAdjust, ceilBub) < 5) {
-											return hide(ceilBub);
-										} else {
-											return show(ceilBub);
-										}
-									} else {
-										return show(ceilBub);
-									}
-								}
-							};
+            return {
+                restrict: 'EA',
+                scope: {
+                    floor            : '@',   // the minimum possible value
+                    ceiling          : '@',   // the maximum possible value
+                    step             : '@',   // how wide is each step, omit or set to 0 for no steps
+                    precision        : '@',   // how many decimal places do we care about
+                    buffer           : '@',   // how close can the two knobs of a dual knob slider get?
+                    stickiness       : '@',   // how sticky should the knobs feel...seriously, how did this get all sticky? gross
+                    showSteps        : '@',   // show the step value bubbles?
+                    ngModel          : '=',   // single knob value binding
+                    ngModelLow       : '=',   // dual knob low value binding
+                    ngModelHigh      : '=',   // dual knob high value binding
+                    translate        : '&',   // how to translate the values displayed in the bubbles
+                    translateRange   : '&',   // how to translate the range bubble
+                    translateCombined: '&',   // how to translate the center bubble 
+                    scale            : '&',   // how to scale the values
+                    inverseScale          : '&'    // how to unscale the values
+                },
+                template: // bar background
+                    "<span class='bar full'></span>" + // secondary bars used for dual knobs
+                    "<span class='bar steps'><span class='bubble step' ng-repeat='step in stepBubbles()'></span></span>" + // step bubbles
+                    "<span class='bar selection'></span><span class='bar unselected low'></span><span class='bar unselected high'></span>" + // the knobs
+                    "<span class='pointer low'></span><span class='pointer high'></span>" + // current value bubbles
+                    "<span class='bubble low'></span><span class='bubble high'></span><span class='bubble middle'></span><span class='bubble selection'></span>" + // low, high, middle and selection bubbles
+                    "<span class='bubble limit floor'></span><span class='bubble limit ceiling'></span>" + // upper and lower limit bubbles
+                    "<input type='range' class='input low' /><input type='range' class='input high' /><input type='range' class='input selection' />", // range sliders used for browsers that support them
 
-							// element event bindings
-							onEnd = function() {
-								stickyOffsetLow = 0;
-								stickyOffsetHigh = 0;
-								if(pointer) {
-									setPointers();
-									adjustBubbles();
-									pointer.removeClass('active');
-								}
-								pointer = null;
-								ref = null;
-								dragRange = false;
-							};
-							onMove = function(event) {
-								if(pointer) {
-									var eventX, newOffset, newPercent, newValue, buffer;
+                compile: function(element, attributes) {
+                    // are we gonna show the step bubbles?
+                    var showSteps = attributes.showSteps;
 
-									buffer = stepBuffer(parseFloat(scope.step), parseFloat(scope.buffer));
+                    // dual knob?
+                    var isDualKnob = (attributes.ngModel == null) && ((attributes.ngModelLow != null) && (attributes.ngModelHigh != null)),
 
-									eventX = event.clientX || event.x;
-									if(dragRange) {
-										newLow = eventX - lowOffset;
-										newHigh = eventX + highOffset;
-										if(newLow < minOffset) {
-											newHigh += minOffset - newLow;
-											newLow = minOffset;
-										} else if(newHigh > maxOffset) {
-											newLow -= newHigh - maxOffset;
-											newHigh = maxOffset;
-										}
-										newLow = percentFromOffset(newLow);
-										newHigh = percentFromOffset(newHigh);
-										stickyOffsetLow = newLow;
-										newLow = minValue + (valueRange * newLow / 100.0);
-										newHigh = minValue + (valueRange * newHigh / 100.0);
-										newLow = roundStep(newLow, parseFloat(scope.precision), parseFloat(scope.step), parseFloat(scope.floor),
-											parseFloat(scope.ceiling));
-										newHigh = roundStep(newHigh, parseFloat(scope.precision), parseFloat(scope.step), parseFloat(scope.floor),
-											parseFloat(scope.ceiling));
-										scope[refLow] = newLow;
-										scope[refHigh] = newHigh;
-										stickyOffsetLow = stickyOffsetHigh = stickyOffsetLow - percentValue(newLow);
-									} else {
-										newOffset = eventX + minOffset - offsetLeft(element) - halfWidth(pointer);
-										newOffset = Math.max(Math.min(newOffset, maxOffset), minOffset);
-										newPercent = percentFromOffset(newOffset);
-										stickyOffsetLow = newPercent;
-										newValue = minValue + (valueRange * newPercent / 100.0);
-										if(range) {
-											if(buffer > 0) {
-												if(ref === refLow) {
-													newValue = newValue > parseFloat(scope[refHigh]) - buffer ? parseFloat(scope[refHigh]) - buffer :
-															   newValue;
-												} else {
-													newValue = newValue < parseFloat(scope[refLow]) + buffer ? parseFloat(scope[refLow]) + buffer :
-															   newValue;
-												}
-											} else {
-												if(ref === refLow) {
-													if(newValue > scope[refHigh]) {
-														ref = refHigh;
-														minPtr.removeClass('active');
-														maxPtr.addClass('active');
-													}
-												} else {
-													if(newValue < scope[refLow]) {
-														ref = refLow;
-														maxPtr.removeClass('active');
-														minPtr.addClass('active');
-													}
-												}
-											}
-										}
-										newValue = roundStep(newValue, parseFloat(scope.precision), parseFloat(scope.step), parseFloat(scope.floor),
-											parseFloat(scope.ceiling));
-										scope[ref] = newValue;
-										if(ref === refLow) {
-											stickyOffsetLow = stickyOffsetLow - percentValue(newValue);
-										} else {
-											stickyOffsetHigh = stickyOffsetLow - percentValue(newValue);
-											stickyOffsetLow = 0;
-										}
-									}
-									setPointers();
-									adjustBubbles();
-									scope.$apply();
-								}
-							};
-							onStart = function(event, ptr, rf) {
-								pointer = ptr;
-								ref = rf;
-								pointer.addClass('active');
-								var eventX = event.clientX || event.x;
-								if(ref == refSel) {
-									dragRange = true;
-									lowOffset = eventX - valueOffset(scope[refLow]) - halfWidth(minPtr);
-									highOffset = valueOffset(scope[refHigh]) - eventX + halfWidth(maxPtr);
-								}
-								var newOffset = eventX + minOffset - offsetLeft(element);
-								newOffset = Math.max(Math.min(newOffset, maxOffset), minOffset);
-								var newValue = minValue + (valueRange * percentFromOffset(newOffset) / 100.0);
-								newValue = roundStep(newValue, parseFloat(scope.precision), parseFloat(scope.step), parseFloat(scope.floor),
-									parseFloat(scope.ceiling));
-								scope[ref] = newValue;
-								setPointers();
-								adjustBubbles();
-								scope.$apply();
-								dimensions();
-							};
-							setBindings = function() {
-								if(inputs) {
-									var bindSlider = function(elem, rf, ptr) {
-										elem = angular.element(elem);
-										
-										var start = function(ev) { onStart(ev, ptr, rf); };
-										var end = function(ev) { onMove(ev); onEnd(); };
-										
-										if(window.navigator.pointerEnabled) {
-											elem.on('pointerdown', start)
-												.on('pointermove', onMove)
-												.on('pointerup', end)
-												.on('pointercancel', onEnd);
-										} else if(window.navigator.msPointerEnabled) {
-											elem.on('MSPointerDown', start)
-												.on('MSPointerMove', onMove)
-												.on('MSPointerUp', end)
-												.on('MSPointerCancel', onEnd);
-										} else {											
-											$swipe.bind(elem, {
-												start: start,
-												move: onMove,
-												end: end,
-												cancel: onEnd
-											});
-										}
-									};
-									bindSlider(minInput, refLow, minPtr);
-									if(range) {
-										bindSlider(maxInput, refHigh, maxPtr);
-										bindSlider(selInput, refSel, selBar);
-									}
-								} else {
-									var bindSwipeStart = function(elem, rf, ptr) {
-										elem = angular.element(elem);
-										if(angular.isUndefined(ptr)) {
-											ptr = elem;
-										} else {
-											ptr = angular.element(ptr);
-										}
-										$swipe.bind(elem, { start: function(ev) { onStart(ev,ptr,rf); } });
-									};
-									var bindSwipe = function(elem) {
-										elem = angular.element(elem);
-										$swipe.bind(elem, {
-											move: onMove,
-											end: function(ev) { onMove(ev); onEnd(); },
-											cancel: onEnd
-										});
-									};
-									bindSwipeStart(minPtr, refLow);
-									bindSwipeStart(maxPtr, refHigh);
-									bindSwipeStart(lowBub, refLow);
-									bindSwipeStart(highBub, refHigh);
-									bindSwipeStart(flrBub, refLow, minPtr);
-									if(range) {
-										bindSwipeStart(ceilBub, refHigh, maxPtr);
-										bindSwipeStart(selBar, refSel);
-										bindSwipeStart(selBub, refSel, selBar);
-										bindSwipeStart(unSelBarLow, refLow, minPtr);
-										bindSwipeStart(unSelBarHigh, refHigh, maxPtr);
-									} else {
-										bindSwipeStart(ceilBub, refLow, minPtr);
-										bindSwipeStart(fullBar, refLow, minPtr);
-									}
-									bindSwipe($document);
-								}
-							};
-							setPointers();
-							adjustBubbles();
-							if(!boundToInputs) {
-								setBindings();
-								boundToInputs = true;
-							}
-						};
-						$timeout(updateDOM);
-						for(_j = 0, _len1 = watchables.length; _j < _len1; _j++) {
-							w = watchables[_j];
-							scope.$watch(w, updateDOM);
-						}
-						angular.element(window).bind("resize", updateDOM);
-						scope.$on('refreshSlider', function() { $timeout(updateDOM); });
-					}
-				};
-			}
-		}
-	}]);
+                    // init element references
+                        refs = {},
+
+                    // which properties do we want to use?
+                        refLow = isDualKnob ? 'ngModelLow' : 'ngModel', refHigh = 'ngModelHigh', refSel = 'selectBar',
+
+                    // which properties to we want to watch for changes?
+                        watchables = ['floor', 'ceiling', 'stickiness', refLow];
+
+                    /**
+                     * Get references to all the children of the given element
+                     * @param {object} [el = element]
+                     * @returns {Array} the children of el
+                     */
+                    function getReferences(el) {
+                        if(!el) {
+                            el = element;
+                        }
+                        var refs = [];
+                        angular.forEach(el.children(), function(el) {
+                            refs.push(angularize(el));
+                        });
+                        return refs;
+                    }
+
+                    /**
+                     * Set the references for use later
+                     * @param {Array} refs
+                     * @param {Boolean} [dual = false] is this a dual knob slider?
+                     * @param {Boolean} [inputs = false] are we using range inputs?
+                     */
+                    function setReferences(refs, dual, inputs) {
+                        return {
+                            fullBar     : refs[0],                                        // background bar
+                            stepBubs    : refs[1],                                        // the steps bubbles
+                            selBar      : dual ? refs[2] : null,                          // dual knob: the bar between knobs
+                            unSelBarLow : dual ? refs[3] : null,                          // dual knob: the bar to the left of the low knob
+                            unSelBarHigh: dual ? refs[4] : null,                          // dual knob: the bar to the right of the high knob
+                            minPtr      : dual ? refs[5] : refs[2],                       // single knob: the knob, dual knob: the low knob
+                            maxPtr      : dual ? refs[6] : null,                          // dual knob: the high knob
+                            lowBub      : dual ? refs[7] : refs[3],                       // single knob: the value bubble, dual knob: the low value bubble
+                            highBub     : dual ? refs[8] : null,                          // dual knob: the high value bubble
+                            cmbBub      : dual ? refs[9] : null,                          // dual knob: the range values bubble
+                            selBub      : dual ? refs[10] : null,                         // dual knob: the range width bubble
+                            flrBub      : dual ? refs[11] : refs[4],                      // the lower limit bubble
+                            ceilBub     : dual ? refs[12] : refs[5],                      // the upper limit bubble
+                            minInput    : inputs ? (dual ? refs[13] : refs[6]) : null,    // single knob: the actual slider input, dual knob: the low value slider input
+                            maxInput    : inputs ? (dual ? refs[14] : null) : null,       // dual knob: the high value slider input
+                            selInput    : inputs ? (dual ? refs[15] : null) : null        // dual knob: the selection slider input
+                        };
+                    }
+
+                    // set up the references
+                    refs = (function() {
+
+                        var _ref = getReferences();
+                        var _results = [];
+                        for(var _i = 0, _len = _ref.length; _i < _len; _i++) {
+                            var e = _ref[_i];
+                            e = angularize(e);
+                            e.css({
+                                'white-space': 'nowrap',
+                                position     : 'absolute',
+                                display      : 'block',
+                                'z-index'    : 1
+                            });
+                            _results.push(e);
+                        }
+                        return _results;
+                    })();
+                    refs = setReferences(refs, true, true);
+
+                    // set up the translation function
+                    if(attributes.translate) {
+                        attributes.$set('translate', "" + attributes.translate + "(value)");
+                    }
+
+                    // set up the translation function for the range bubble
+                    if(attributes.translateRange) {
+                        attributes.$set('translateRange', "" + attributes.translateRange + "(low,high)");
+                    }
+
+                    // set up the translation function for the center bubble
+                    if(attributes.translateCombined) {
+                        attributes.$set('translateCenter', "" + attributes.translateCombined + "(low,high)");
+                    }
+
+                    // set up the encoding function
+                    if(attributes.scale) {
+                        attributes.$set('scale', "" + attributes.scale + "(value)");
+                    }
+
+                    // set up the decoding function
+                    if(attributes.inverseScale) {
+                        attributes.$set('inverseScale', "" + attributes.inverseScale + "(value)");
+                    }
+
+                    // set up the background bar so it fills the entire width of the slider
+                    refs.fullBar.css({
+                        left : 0,
+                        right: 0
+                    });
+
+                    // set up range inputs
+                    if(AngularSlider.rangeInputs) {
+                        // we can use range inputs
+
+                        /**
+                         * default range input styles
+                         * @type {{position: string, margin: number, padding: number, opacity: number, height: string}}
+                         */
+                        var inputStyles = {
+                            position: 'absolute',
+                            margin  : 0,
+                            padding : 0,
+                            opacity : 0,
+                            height  : '100%'
+                        };
+
+                        // set up the low value range input
+                        refs.minInput.attr('step', expression("inputSteps()"));  // set the number of steps
+                        refs.minInput.attr('min', expression("floor"));          // set the minimum possible value
+                        refs.minInput.css(inputStyles);                          // apply the default styles
+                        refs.minInput.css('left', 0);                            // stick it to the left
+
+                        if(isDualKnob) {
+                            // this is a dual knob slider
+
+                            refs.minInput.attr('max', expression("ngModelHigh - (buffer / 2)")); // set the maximum value of the low range input so it doesn't overlap the high range input's minimum value
+
+                            // set up the high value range input
+                            refs.maxInput.attr('step', expression("inputSteps()"));              // set the number of steps
+                            refs.maxInput.attr('min', expression("ngModelLow + (buffer / 2)"));  // set the minimum value of the high range input so it doesn't overlap the low range input's maximum value
+                            refs.maxInput.attr('max', expression("ceiling"));                    // set the maximum possible value
+                            refs.maxInput.css(inputStyles);                                      // apply the default styles
+
+                            // set up the selection range input
+                            refs.selInput.attr('step', expression("inputSteps()"));  // set the number of steps
+                            refs.selInput.attr('min', expression("ngModelLow"));     // set up the minimum value
+                            refs.selInput.attr('max', expression("ngModelHigh"));    // set up the maximum falue
+                            refs.selInput.css(inputStyles);                          // apply the default styles
+                        } else {
+                            // this is single knob slider
+
+                            refs.minInput.attr('max', expression("ceiling"));    // set the maximum possible value
+                            refs.minInput.css({ width: '100%' });                // make sure it fills the entire slider
+                            refs.maxInput.remove();                              // get rid of the high value range input
+                            refs.selInput.remove();                              // get rid of the selection value range input
+                        }
+                    } else {
+                        // we can't use range inputs :(
+                        refs.minInput.remove();
+                        refs.maxInput.remove();
+                        refs.selInput.remove();
+                    }
+
+                    // set up bubbles
+                    bindHtml(refs.stepBubs.children().eq(0), expression("translation(step)"));
+                    bindHtml(refs.ceilBub, expression("translation(ceiling)"));
+                    bindHtml(refs.flrBub, expression("translation(floor)"));
+                    bindHtml(refs.selBub, expression("rangeTranslation(" + refLow + "," + refHigh + ")"));
+                    bindHtml(refs.lowBub, expression("translation(" + refLow + ")"));
+                    bindHtml(refs.highBub, expression("translation(" + refHigh + ")"));
+                    bindHtml(refs.cmbBub, expression("combinedTranslation(" + refLow + "," + refHigh + ")"));
+
+                    // start to compile watchables
+                    if(isDualKnob) {
+                        // dual knob so also watch the high value and buffer
+                        watchables.push(refHigh);
+                        watchables.unshift('buffer');
+                    } else {
+                        // single knob so get rid of what we don't need
+                        var _ref1 = [refs.selBar, refs.unSelBarLow, refs.unSelBarHigh, refs.maxPtr, refs.selBub, refs.highBub, refs.cmbBub];
+                        for(var _i = 0, _len = _ref1.length; _i < _len; _i++) {
+                            element = _ref1[_i];
+                            element.remove();
+                        }
+                    }
+                    // make sure the precision and step are first in the list
+                    watchables.unshift('precision', 'step');
+                    
+                    if(!showSteps) {
+                        // we're not displaying the step bubbles this time
+                        refs.stepBubs.children().remove();
+                    }
+
+                    return {
+                        post: function(scope, element, attributes) {
+                            // re-set references locally to avoid any cross contamination and disassociation when using transcluded scopes (namely ng-repeat)
+                            var refs = setReferences(getReferences(element), isDualKnob, AngularSlider.rangeInputs);
+
+                            /**
+                             * Save the decoded values so we don't have to decode every...single...time....ugh
+                             * @type {{floor: number, ceiling: number, step: number, precision: number, buffer: number, stickiness: number, ngModel: number, ngModelLow: number, ngModelHigh: number}}
+                             */
+                            scope.decodedValues = {
+                                floor      : 0,
+                                ceiling    : 0,
+                                step       : 0,
+                                precision  : 0,
+                                buffer     : 0,
+                                stickiness : 0,
+                                ngModel    : 0,
+                                ngModelLow : 0,
+                                ngModelHigh: 0
+                            };
+
+                            /**
+                             * Apply the supplied translation function if necessary
+                             * @param {(string|Number)} value
+                             * @returns {string}
+                             */
+                            scope.translation = function(value) {
+                                value = parseFloat(value).toFixed(scope.precision);
+                                if(angular.isUndefined(attributes.translate)) {
+                                    return '' + value;
+                                }
+                                return scope.translate({value: value});
+                            };
+
+                            /**
+                             * Apply the supplied translation function for the range if necessary
+                             * @param {(string|Number)} low
+                             * @param {(string|number)} high
+                             * @returns {string}
+                             */
+                            scope.rangeTranslation = function(low, high) {
+                                low = parseFloat(low).toFixed(scope.precision);
+                                high = parseFloat(high).toFixed(scope.precision);
+                                if(angular.isUndefined(attributes.translateRange)) {
+                                    return "Range: " + scope.translate({value: parseFloat((high - low).toFixed(scope.precision))});
+                                }
+                                return scope.translateRange({low: low, high: high});
+                            };
+
+                            /**
+                             * Apply the supplied translation function for the center if necessary
+                             * @param {(string|Number)} low
+                             * @param {(string|number)} high
+                             * @returns {string}
+                             */
+                            scope.combinedTranslation = function(low, high) {
+                                low = parseFloat(low).toFixed(scope.precision);
+                                high = parseFloat(high).toFixed(scope.precision);
+                                if(angular.isUndefined(attributes.translateRange)) {
+                                    return scope.translate({value: low}) + " - " + scope.translate({value: high});
+                                }
+                                return scope.translateCombined({low: low, high: high});
+                            };
+
+                            /**
+                             * Encode the value given
+                             * @param {number} value
+                             * @returns {number}
+                             */
+                            scope.encode = function(value) {
+                                if(angular.isUndefined(attributes.scale) || attributes.scale == '') {
+                                    return value;
+                                }
+                                return scope.scale({value: value});
+                            };
+
+                            /**
+                             * Decode the value given
+                             * @param {number} value
+                             * @returns {number}
+                             */
+                            scope.decode = function(value) {
+                                if(angular.isUndefined(attributes.inverseScale) || attributes.inverseScale == '') {
+                                    return value;
+                                }
+                                return scope.inverseScale({value: value});
+                            };
+                            
+                            if(Math.round(scope.encode(scope.decode(1))) != 1 || Math.round(scope.encode(scope.decode(100))) != 100) {
+                                console.warn("The scale and inverseScale functions are not perfect inverses: 1 = "+scope.encode(scope.decode(1))+"  100 = "+scope.encode(scope.decode(100)));
+                            }
+
+                            /**
+                             * Decode the value of the given reference
+                             * @param {string} ref
+                             * @returns {number}
+                             */
+                            scope.decodeRef = function(ref) {
+                                return scope.decode(scope[ref]);
+                            };
+
+                            /**
+                             * How precise do the range inputs need to be?
+                             * @returns {number}
+                             */
+                            scope.inputSteps = function() {
+                                return Math.pow(10, scope.precision * -1);
+                            };
+
+                            /**
+                             * The width of the background bar
+                             * @type {number}
+                             */
+                            var barWidth = 0;
+
+                            /**
+                             * Half the width of the knob/bar in use
+                             * @type {number}
+                             */
+                            var pointerHalfWidth = 0;
+
+                            /**
+                             * Left most possible position
+                             * @type {number}
+                             */
+                            var minOffset = 0;
+
+                            /**
+                             * Right most possible position
+                             * @type {number}
+                             */
+                            var maxOffset = 0;
+
+                            /**
+                             * How much width do we have to work with
+                             * @type {number}
+                             */
+                            var offsetRange = 0;
+
+                            /**
+                             * The minimum value of the slider
+                             * @type {number}
+                             */
+                            var minValue = 0;
+
+                            /**
+                             * The minimum value of the slider (decoded)
+                             * @type {number}
+                             */
+                            var minValueDecoded = 0;
+
+                            /**
+                             * The maximum value of the slider
+                             * @type {number}
+                             */
+                            var maxValue = 0;
+
+                            /**
+                             * The maximum value of the slider (decoded)
+                             * @type {number}
+                             */
+                            var maxValueDecoded = 0;
+
+                            /**
+                             * The total range of the slider
+                             * @type {number}
+                             */
+                            var valueRange = 0;
+
+                            /**
+                             * The total range of the slider (decoded)
+                             * @type {number}
+                             */
+                            var valueRangeDecoded = 0;
+
+                            /**
+                             * How far from a step is the low knob?
+                             * @type {number}
+                             */
+                            var stickyOffsetLow = 0;
+
+                            /**
+                             * How far from a step is the high knob?
+                             * @type {number}
+                             */
+                            var stickyOffsetHigh = 0;
+
+                            /**
+                             * Have the events been bound to the necessary inputs/elements
+                             * @type {boolean}
+                             */
+                            var eventsBound = false;
+
+                            /**
+                             * Update the necessary dimensions
+                             */
+                            function dimensions() {
+
+                                // make sure the watchables are all valid
+                                angular.forEach(watchables, function(watchable) {
+                                    
+                                    // parse them to floats
+                                    scope[watchable] = parseFloat(scope[watchable]);
+
+                                    if(watchable == refLow || watchable == refHigh) {
+                                        // this is the low or high value so bring them back in line with the steps
+                                        scope[watchable] = roundStep(scope[watchable], scope.precision, scope.step, scope.floor, scope.ceiling);
+                                    } else if(watchable == 'buffer') {
+                                        // this is the buffer so make sure it aligns with the steps
+                                        scope.buffer = stepBuffer(scope.step, scope.buffer);
+                                    } else if(watchable == 'precision') {
+                                        // make sure the precision is valid
+                                        if(!scope.precision || isNaN(scope.precision)) {
+                                            scope.precision = 0;
+                                        } else {
+                                            scope.precision = parseInt(scope.precision);
+                                        }
+                                    } else if(watchable == 'step') {
+                                        // make sure the step is valid
+                                        if(!scope.step || isNaN(scope.step)) {
+                                            scope.step = 1 / Math.pow(10, scope.precision);
+                                        } else {
+                                            scope.step = parseFloat(scope.step.toFixed(scope.precision));
+                                        }
+                                    } else if(watchable == 'stickiness') {
+                                        // make sure the stickiness is valid
+                                        if(isNaN(scope.stickiness)) {
+                                            scope.stickiness = KNOB_STICKINESS;
+                                        } else if(scope.stickiness < 1) {
+                                            scope.stickiness = 1;
+                                        }
+                                    }
+                                    
+                                    // save the decoded values
+                                    scope.decodedValues[watchable] = scope.decodeRef(watchable);
+
+                                });
+
+                                if(isDualKnob) {
+                                    // if this is a dual knob slider
+
+                                    // make sure the low value is actually lower than the high value
+                                    if(scope[refHigh] < scope[refLow]) {
+                                        var temp = scope[refHigh];
+                                        scope[refHigh] = scope[refLow];
+                                        scope[refLow] = temp;
+                                    }
+
+                                    // get the difference between the knobs, but make sure it's rounded to a step
+                                    var diff = roundStep(scope[refHigh] - scope[refLow], scope.precision, scope.step);
+
+                                    if(scope.buffer > 0 && diff < scope.buffer) {
+                                        // we need a buffer but the difference is smaller than the required buffer
+
+                                        // so find the middle
+                                        var avg = scope.encode((scope.decodedValues[refLow] + scope.decodedValues[refHigh]) / 2);
+
+                                        // and set the knobs so they straddle the middle with the required amount of buffer
+                                        scope[refLow] = roundStep(avg - (scope.buffer / 2), scope.precision, scope.step, scope.floor, scope.ceiling);
+                                        scope[refHigh] = scope[refLow] + scope.buffer;
+
+                                        if(scope[refHigh] > scope.ceiling) {
+                                            // the high value is out of range
+
+                                            // so set the high value to the maximum
+                                            scope[refHigh] = scope.ceiling;
+                                            // but keep the buffer correct
+                                            scope[refLow] = scope.ceiling - scope.buffer;
+                                        }
+                                    }
+                                }
+
+                                // save the various dimensions we'll need
+                                barWidth = width(refs.fullBar);
+                                pointerHalfWidth = halfWidth(refs.minPtr);
+
+                                minOffset = offsetLeft(refs.fullBar);
+                                maxOffset = minOffset + barWidth - width(refs.minPtr);
+                                offsetRange = maxOffset - minOffset;
+
+                                minValue = scope.floor;
+                                minValueDecoded = scope.decodedValues.floor;
+                                maxValue = scope.ceiling;
+                                maxValueDecoded = scope.decodedValues.ceiling;
+                                valueRange = maxValue - minValue;
+                                valueRangeDecoded = maxValueDecoded - minValueDecoded;
+                            }
+
+                            /**
+                             * Lets make everything look good
+                             */
+                            function updateDOM() {
+
+                                var dragRange,      // is the user dragging the entire range and not just one knob?
+                                    lowValueOffset,      // where did the low knob start
+                                    highValueOffset,     // where did the high knob start
+                                    pointer,        // which knob/bar is being dragged
+                                    ref;            // which value should we be changing
+
+                                // update the dimensions
+                                dimensions();
+
+                                // set the limit bubble positions
+                                offset(refs.flrBub, 0);
+                                offset(refs.ceilBub, pixelize(barWidth - width(refs.ceilBub)));
+
+                                /**
+                                 * Get the offset percentage from the given absolute offset
+                                 * @param {number} offset
+                                 * @returns {number}
+                                 */
+                                function percentFromOffset(offset) {
+                                    return ((offset - minOffset) / offsetRange) * 100;
+                                }
+
+                                /**
+                                 * Get the decoded value from the given offset
+                                 * @param {number} offset
+                                 * @returns {number}
+                                 */
+                                function decodedValueFromOffset(offset) {
+                                    return percentFromOffset(offset)/100 * valueRangeDecoded + minValueDecoded;
+                                }
+
+                                /**
+                                 * Get the value from the given offset
+                                 * @param {number} offset
+                                 * @returns {number}
+                                 */
+                                function valueFromOffset(offset) {
+                                    return scope.encode(decodedValueFromOffset(offset));
+                                }
+
+                                /**
+                                 * Get the absolute offset from the given decoded value
+                                 * @param {number} value
+                                 * @returns {number}
+                                 */
+                                function offsetFromDecodedValue(value) {
+                                    return (((value - minValueDecoded) / valueRangeDecoded) * offsetRange) + minOffset;
+                                }
+
+                                /**
+                                 * Get the absolute offset from the given value
+                                 * @param {number} value
+                                 * @returns {number}
+                                 */
+                                function offsetFromValue(value) {
+                                    return offsetFromDecodedValue(scope.decode(value));
+                                }
+
+                                /**
+                                 * Get the offset percentage from the given decoded value
+                                 * @param {number} value
+                                 * @returns {number}
+                                 */
+                                function percentFromDecodedValue(value) {
+                                    return ((value - minValueDecoded) / valueRangeDecoded) * 100;
+                                }
+
+                                /**
+                                 * Get the offset percentage from the given value
+                                 * @param {number} value
+                                 * @returns {number}
+                                 */
+                                function percentFromValue(value) {
+                                    return percentFromDecodedValue(scope.decode(value));
+                                }
+
+                                /**
+                                 * Get the absolute offset (in px) from the given offset percentage
+                                 * @param {number} percent
+                                 * @returns {string}
+                                 */
+                                function offsetFromPercent(percent) {
+                                    return pixelize(percent * offsetRange / 100);
+                                }
+
+                                /**
+                                 * Bring the offset back in range of the slider
+                                 * @param {number} offset
+                                 * @returns {number}
+                                 */
+                                function bringOffsetInRange(offset) {
+                                    return Math.min(Math.max(offset, minOffset), maxOffset);
+                                }
+
+                                /**
+                                 * Bring the element back within the confines of the slider
+                                 * @param {object} element
+                                 * @returns {Object}
+                                 */
+                                function fitToBar(element) {
+                                    return offset(element, offsetFromPercent(percentFromOffset(bringOffsetInRange(offsetLeft(element)))));
+                                }
+
+                                /**
+                                 * Compute the amount of stretch
+                                 * @param {number} percent the mouse offset from the start position
+                                 * @param {number} [maxPercent = 100] the maximum stretch
+                                 * @param {boolean} [end = false] are we beyond the max stretch?
+                                 * @returns {number}
+                                 */
+                                function percentStretch(percent, maxPercent, end) {
+
+                                    // which direction?
+                                    var sign = percent > 0 ? 1 : -1;
+
+                                    // if the maxPercent is 0 or not given apply no limit (i.e. set it to 100)
+                                    maxPercent = !maxPercent ? 100 : maxPercent;
+
+                                    if(end) {
+                                        // compute the max stretch amount
+                                        return (
+                                                   Math.sin((
+                                                                Math.min(Math.abs(percent / maxPercent), 1) * Math.PI
+                                                                ) - (Math.PI / 2)) + 1
+                                                   ) * sign * maxPercent / 6;
+                                    }
+
+                                    // compute the current stretch amount
+                                    return (
+                                        sign * Math.pow(Math.min(Math.abs(percent / maxPercent * 2), 1), scope.stickiness) * maxPercent / 2
+                                        );
+                                }
+
+                                /**
+                                 * Update the pointers in the DOM
+                                 */
+                                function setPointers() {
+
+                                    /**
+                                     * The base percent for the low knob
+                                     * @type {number}
+                                     */
+                                    var rawLowPercent = percentFromDecodedValue(scope.decodedValues[refLow]);
+
+                                    /**
+                                     * The width in percent of a step above the low value
+                                     * @type {number}
+                                     */
+                                    var stepWidthPercentAboveLow = percentFromValue(scope[refLow] + scope.step) - rawLowPercent;
+
+                                    /**
+                                     * The width in percent of a step below the low value
+                                     * @type {number}
+                                     */
+                                    var stepWidthPercentBelowLow = rawLowPercent - percentFromValue(scope[refLow] - scope.step);
+
+                                    /**
+                                     * The width in percent of the buffer above the low value
+                                     * @type {number}
+                                     */
+                                    var bufferWidthPercentLow = percentFromValue(scope[refLow] + scope.buffer) - rawLowPercent;
+
+                                    /**
+                                     * The width in percent of the pointer
+                                     * @type {number}
+                                     */
+                                    var ptrHalfWidthPercent = percentFromOffset(pointerHalfWidth + minOffset);
+
+                                    /**
+                                     * The percent for the low knob after the stretch has been applied
+                                     * @type {number}
+                                     */
+                                    var stretchedLowPercent = rawLowPercent + percentStretch(stickyOffsetLow, stickyOffsetLow > 0?stepWidthPercentAboveLow:stepWidthPercentBelowLow);
+
+                                    // set the low knob's and bubble's new positions
+                                    offset(refs.minPtr, offsetFromPercent(stretchedLowPercent));
+                                    offset(refs.lowBub,
+                                        offsetFromPercent(percentFromOffset(offsetLeft(refs.minPtr) - halfWidth(refs.lowBub) + pointerHalfWidth)));
+
+                                    if(isDualKnob) {
+                                        // dual knob slider
+
+                                        /**
+                                         * The base percent for the high knob
+                                         * @type {number}
+                                         */
+                                        var rawHighPercent = percentFromDecodedValue(scope.decodedValues[refHigh]);
+
+                                        /**
+                                         * The width in percent of a step above the high value
+                                         * @type {number}
+                                         */
+                                        var stepWidthPercentAboveHigh = percentFromValue(scope[refHigh] + scope.step) - rawHighPercent;
+
+                                        /**
+                                         * The width in percent of a step below the high value
+                                         * @type {number}
+                                         */
+                                        var stepWidthPercentBelowHigh = rawHighPercent - percentFromValue(scope[refHigh] - scope.step);
+
+                                        /**
+                                         * The width in percent of the buffer below the high value
+                                         * @type {number}
+                                         */
+                                        var bufferWidthPercentHigh = rawHighPercent - percentFromValue(scope[refHigh] - scope.buffer);
+
+                                        /**
+                                         * The percent for the high knob after the stretch has been applied
+                                         * @type {number}
+                                         */
+                                        var stretchedHighPercent = rawHighPercent + percentStretch(stickyOffsetHigh, stickyOffsetHigh > 0?stepWidthPercentAboveHigh:stepWidthPercentBelowHigh);
+
+                                        if(stretchedLowPercent > rawHighPercent - bufferWidthPercentHigh) {
+                                            // if the low knob has reached its maximum
+
+                                            // get the new stretch amount for the low knob
+                                            stretchedLowPercent = rawLowPercent + percentStretch(stickyOffsetLow, bufferWidthPercentLow, true);
+
+                                            // and re-set the low knob's and bubble's new positions
+                                            offset(refs.minPtr, offsetFromPercent(stretchedLowPercent));
+                                            offset(refs.lowBub, offsetFromPercent(percentFromOffset(offsetLeft(refs.minPtr) - halfWidth(refs.lowBub) +
+                                                                                                    pointerHalfWidth)));
+                                        }
+
+                                        if(stretchedHighPercent < rawLowPercent + bufferWidthPercentLow) {
+                                            // if the high knob has reached its minimum
+
+                                            // get the new stretch amount for the high knob
+                                            stretchedHighPercent = rawHighPercent + percentStretch(stickyOffsetHigh, bufferWidthPercentHigh, true);
+                                        }
+
+                                        // set the high knob's and bubble's new positions
+                                        offset(refs.maxPtr, offsetFromPercent(stretchedHighPercent));
+                                        offset(refs.highBub, offsetFromPercent(percentFromOffset(offsetLeft(refs.maxPtr) - halfWidth(refs.highBub) +
+                                                                                                 pointerHalfWidth)));
+
+                                        // set the selection bar's new position and width
+                                        offset(refs.selBar, offsetFromPercent(stretchedLowPercent + ptrHalfWidthPercent));
+                                        refs.selBar.css({
+                                            width: offsetFromPercent(stretchedHighPercent - stretchedLowPercent)
+                                        });
+
+                                        // set the selection bubbles' new positions
+                                        offset(refs.selBub, offsetFromPercent(stretchedLowPercent +
+                                                                              percentFromOffset(halfWidth(refs.selBar) - halfWidth(refs.selBub) +
+                                                                                                minOffset)));
+                                        offset(refs.cmbBub, offsetFromPercent(stretchedLowPercent +
+                                                                              percentFromOffset(halfWidth(refs.selBar) - halfWidth(refs.cmbBub) +
+                                                                                                minOffset)));
+
+                                        // set the low unselected bar's new position and width
+                                        refs.unSelBarLow.css({
+                                            left : 0,
+                                            width: offsetFromPercent(stretchedLowPercent + ptrHalfWidthPercent)
+                                        });
+
+                                        // set the high unselected bar's new position and width
+                                        offset(refs.unSelBarHigh, offsetFromPercent(stretchedHighPercent + ptrHalfWidthPercent));
+                                        refs.unSelBarHigh.css({
+                                            right: 0
+                                        });
+
+                                        if(AngularSlider.rangeInputs) {
+                                            // we're using range inputs
+
+                                            // get the high input's new position
+                                            var maxInputLowPercent = stretchedLowPercent + (bufferWidthPercentLow / 2);
+
+                                            // set the low input's new width
+                                            refs.minInput.css({
+                                                width: offsetFromPercent(stretchedHighPercent - (bufferWidthPercentLow / 2))
+                                            });
+
+                                            // set the high input's new position and width
+                                            refs.maxInput.css({
+                                                left : offsetFromPercent(maxInputLowPercent + (ptrHalfWidthPercent * 2)),
+                                                width: offsetFromPercent(100 - maxInputLowPercent)
+                                            });
+
+                                            // set the selection input's new position and width
+                                            refs.selInput.css({
+                                                left : offsetFromPercent(stretchedLowPercent + (ptrHalfWidthPercent * 2)),
+                                                width: offsetFromPercent(stretchedHighPercent - stretchedLowPercent - (ptrHalfWidthPercent * 2))
+                                            });
+                                        }
+                                    }
+                                }
+
+                                /**
+                                 * Update the bubbles in the DOM
+                                 */
+                                function adjustBubbles() {
+
+                                    /**
+                                     * The bubble to use for dual knobs
+                                     * @type {object}
+                                     */
+                                    var bubToAdjust = refs.lowBub;
+
+                                    // make sure the low value bubble is actually within the slider
+                                    fitToBar(refs.lowBub);
+
+                                    if(isDualKnob) {
+                                        // this is a dual knob slider
+
+                                        // make sure the high value and selection value bubbles are actually within the slider
+                                        fitToBar(refs.highBub);
+                                        fitToBar(refs.selBub);
+
+                                        if(gap(refs.lowBub, refs.highBub) < 10) {
+                                            // the low and high bubbles are overlapping
+
+                                            // so hide them both
+                                            hide(refs.lowBub);
+                                            hide(refs.highBub);
+
+                                            // and show the center bubble
+                                            show(refs.cmbBub);
+
+                                            // and make sure the center bubble is actually within the slider
+                                            fitToBar(refs.cmbBub);
+
+                                            // the center bubble is the bubble we care about now
+                                            bubToAdjust = refs.cmbBub;
+                                        } else {
+                                            // the low and high bubbles aren't overlapping
+
+                                            // so show the low and high bubbles
+                                            show(refs.lowBub);
+                                            show(refs.highBub);
+
+                                            // and hide the center bubble
+                                            hide(refs.cmbBub);
+                                            bubToAdjust = refs.highBub;
+                                        }
+                                    }
+
+                                    if(gap(refs.flrBub, refs.lowBub) < 5) {
+                                        // the low bubble overlaps the floor bubble
+
+                                        // so hide the floor bubble
+                                        hide(refs.flrBub);
+                                    } else {
+                                        // the low bubble doesn't overlap the floor bubble
+
+                                        if(isDualKnob) {
+                                            // this is a dual knob slider
+
+                                            if(gap(refs.flrBub, bubToAdjust) < 5) {
+                                                // the bubble overlaps the floor bubble
+
+                                                // so hide the floor bubble
+                                                hide(refs.flrBub);
+                                            } else {
+                                                // no overlap
+
+                                                // so show the floor bubble
+                                                show(refs.flrBub);
+                                            }
+                                        } else {
+                                            // single knob slider
+
+                                            // so show the floor slider
+                                            show(refs.flrBub);
+                                        }
+                                    }
+
+                                    if(gap(refs.lowBub, refs.ceilBub) < 5) {
+                                        // the low bubble overlaps the ceiling bubble
+
+                                        // so hide the ceiling bubble
+                                        hide(refs.ceilBub);
+                                    } else {
+                                        // the low bubble doesn't overlap the ceiling bubble
+
+                                        if(isDualKnob) {
+                                            // dual knob slider
+
+                                            if(gap(bubToAdjust, refs.ceilBub) < 5) {
+                                                // the bubble overlaps the ceiling bubble
+
+                                                // so hide the ceiling bubble
+                                                hide(refs.ceilBub);
+                                            } else {
+                                                // no overlap
+
+                                                // so show the ceiling bubble
+                                                show(refs.ceilBub);
+                                            }
+                                        } else {
+                                            // no overlap
+
+                                            // so show the ceiling bubble
+                                            show(refs.ceilBub);
+                                        }
+                                    }
+                                }
+
+                                /**
+                                 * What to do when dragging ends
+                                 */
+                                function onEnd() {
+
+                                    // reset the offsets
+                                    stickyOffsetLow = 0;
+                                    stickyOffsetHigh = 0;
+
+                                    if(pointer) {
+                                        // if we have a pointer reference
+
+                                        // update all the elements in the DOM
+                                        setPointers();
+                                        adjustBubbles();
+
+                                        // the pointer is no longer active
+                                        pointer.removeClass('active');
+                                    }
+
+                                    // reset the references
+                                    pointer = null;
+                                    ref = null;
+                                    dragRange = false;
+                                }
+
+                                /**
+                                 * What to do when the knob/bar is moved
+                                 * @param {object} event
+                                 */
+                                function onMove(event) {
+                                    if(pointer) {
+                                        // we have a reference to a knob/bar
+
+                                        scope.$apply(function() {
+
+                                            /**
+                                             * The current x position of the mouse/finger/etc.
+                                             * @type {number}
+                                             */
+                                            var currentX = event.clientX || event.x;
+
+                                            if(dragRange) {
+                                                // the entire range is being dragged
+
+                                                /**
+                                                 * The new offset for the low knob
+                                                 * @type {number}
+                                                 */
+                                                var newLowValue = valueFromOffset(currentX) - lowValueOffset;
+
+                                                /**
+                                                 * The new offset for the high knob
+                                                 * @type {number}
+                                                 */
+                                                var newHighValue = valueFromOffset(currentX) + highValueOffset;
+
+                                                if(newLowValue < minValue) {
+                                                    // the new low is outside of the slider
+
+                                                    // so bring the values back within range
+                                                    newHighValue += minValue - newLowValue;
+                                                    newLowValue = minValue;
+                                                } else if(newHighValue > maxValue) {
+                                                    // the new high value is outside of the slider
+
+                                                    // so bring the values back within range
+                                                    newLowValue -= newHighValue - maxValue;
+                                                    newHighValue = maxValue;
+                                                }
+
+                                                // get the offset percentages
+                                                var newLowPercent = percentFromValue(newLowValue);
+                                                var newHighPercent = percentFromValue(newHighValue);
+
+                                                // save the temporary sticky offset
+                                                stickyOffsetLow = newLowPercent;
+                                                stickyOffsetHigh = newHighPercent;
+
+                                                // round the raw values to steps and assign them to the knobs
+                                                scope[refLow] = newLowValue = roundStep(newLowValue, scope.precision, scope.step, scope.floor, scope.ceiling);
+                                                scope[refHigh] = newHighValue = roundStep(newHighValue, scope.precision, scope.step, scope.floor, scope.ceiling);
+
+                                                // keep the difference between both knobs the same
+                                                stickyOffsetLow = stickyOffsetLow - percentFromValue(newLowValue);
+                                                stickyOffsetHigh = stickyOffsetHigh- percentFromValue(newHighValue);
+                                            } else {
+                                                // only one knob is being dragged
+
+                                                /**
+                                                 * The new offset for the knob being dragged
+                                                 * @type {number}
+                                                 */
+                                                var newOffset = bringOffsetInRange(currentX + minOffset - offsetLeft(element) - halfWidth(pointer));
+
+                                                /**
+                                                 * The new offset percent for the knob being dragged
+                                                 * @type {number}
+                                                 */
+                                                var newPercent = percentFromOffset(newOffset);
+
+                                                /**
+                                                 * The new value for the knob being dragged
+                                                 * @type {number}
+                                                 */
+                                                var newValue = scope.encode(minValueDecoded + (valueRangeDecoded * newPercent / 100.0));
+
+                                                // set the sticky offset for the low knob
+                                                stickyOffsetLow = newPercent;
+
+                                                if(isDualKnob) {
+                                                    // dual knob slider
+
+                                                    if(scope.buffer > 0) {
+                                                        // we need to account for the buffer
+
+                                                        if(ref === refLow) {
+                                                            // the low knob is being dragged
+
+                                                            if(newValue > scope[refHigh] - scope.buffer) {
+                                                                // the new value cuts into the buffer
+
+                                                                // so make the value respect the buffer
+                                                                newValue = scope[refHigh] - scope.buffer
+                                                            }
+                                                        } else {
+                                                            // the high knob is being dragged
+
+                                                            if(newValue < scope[refLow] + scope.buffer) {
+                                                                // the new value cuts into the buffer
+
+                                                                // so make the value respect the buffer
+                                                                newValue = scope[refLow] + scope.buffer;
+                                                            }
+                                                        }
+                                                    } else {
+                                                        // we don't have to worry about a buffer
+
+                                                        if(ref === refLow) {
+                                                            // the low knob is being dragged
+
+                                                            if(newValue > scope[refHigh]) {
+                                                                // the new value is greater then the value of the high knob
+
+                                                                // so set the low value to what the high used to be
+                                                                scope[refLow] = scope[refHigh];
+
+                                                                // switch the reference
+                                                                ref = refHigh;
+
+                                                                // and the classes
+                                                                refs.minPtr.removeClass('active');
+                                                                refs.maxPtr.addClass('active');
+                                                            }
+                                                        } else {
+                                                            // the high knob is being dragged
+
+                                                            if(newValue < scope[refLow]) {
+                                                                // the new value is less than the value of the low knob
+
+                                                                // so set the high value to what the low used to be
+                                                                scope[refHigh] = scope[refLow];
+
+                                                                // switch the references
+                                                                ref = refLow;
+
+                                                                // and the classes
+                                                                refs.maxPtr.removeClass('active');
+                                                                refs.minPtr.addClass('active');
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
+                                                // round the new value and assign it
+                                                scope[ref] = newValue = roundStep(newValue, scope.precision, scope.step, scope.floor, scope.ceiling);
+
+                                                if(ref === refLow) {
+                                                    // the low knob is being dragged
+
+                                                    // so update the sticky offset for the low knob
+                                                    stickyOffsetLow = stickyOffsetLow - percentFromValue(newValue);
+                                                } else {
+                                                    // the high knob is being dragged
+
+                                                    // so update the sticky offset for the high knob
+                                                    stickyOffsetHigh = stickyOffsetLow - percentFromValue(newValue);
+
+                                                    // and ensure the low knob stays put
+                                                    stickyOffsetLow = 0;
+                                                }
+                                            }
+
+                                            // update the DOM
+                                            setPointers();
+                                            adjustBubbles();
+
+                                        });
+                                    }
+                                }
+
+                                /**
+                                 * What to do when a knob/bar is starting to be dragged
+                                 * @param {object} event
+                                 * @param {object} ptr
+                                 * @param {string} rf
+                                 */
+                                function onStart(event, ptr, rf) {
+
+                                    // save the pointer reference
+                                    pointer = ptr;
+
+                                    // save the a reference to the model
+                                    ref = rf;
+
+                                    // set the knob/bar to active
+                                    pointer.addClass('active');
+
+                                    // get the current x position of the mouse/finger/etc. 
+                                    var currentX = event.clientX || event.x;
+
+                                    // get the raw value where the mouse/finger/etc is starting
+                                    var newValue = minValueDecoded +
+                                                   (valueRangeDecoded * percentFromOffset(bringOffsetInRange(currentX + minOffset - offsetLeft(element))) /
+                                                    100.0);
+
+                                    if(ref == refSel) {
+                                        // the selection bar is being dragged
+
+                                        // so tell everyone else this is the case
+                                        dragRange = true;
+                                        
+                                        var startValue = valueFromOffset(currentX);
+
+                                        // and save the start positions
+                                        lowValueOffset = startValue - scope[refLow];
+                                        highValueOffset = scope[refHigh] - startValue;
+                                    }
+
+                                    // round the value to a step and assign the value
+                                    scope[ref] = roundStep(scope.encode(newValue), scope.precision, scope.step, scope.floor, scope.ceiling);
+
+                                    // update the DOM
+                                    setPointers();
+                                    adjustBubbles();
+
+                                    // and digest the changes
+                                    scope.$apply();
+
+                                    // then set the dimensions we need
+                                    dimensions();
+                                }
+
+                                /**
+                                 * Bind the various events to the various DOM elements
+                                 */
+                                function setBindings() {
+                                    if(AngularSlider.rangeInputs) {
+                                        // we're using range inputs
+
+                                        /**
+                                         * Bind the events necessary for a range input
+                                         * @param {object} elem
+                                         * @param {object} ptr
+                                         * @param {string} rf
+                                         */
+                                        function bindSlider(elem, ptr, rf) {
+
+                                            // make sure the element has all the methods and properties we'll need
+                                            elem = angularize(elem);
+
+                                            /**
+                                             * Start event
+                                             * @param {event} ev
+                                             */
+                                            function start(ev) {
+                                                onStart(ev, ptr, rf);
+                                            }
+
+                                            /**
+                                             * End event
+                                             * @param {event} ev
+                                             */
+                                            function end(ev) {
+                                                onMove(ev);
+                                                onEnd();
+                                            }
+
+                                            // bind events to the range input
+                                            if(window.navigator.pointerEnabled) {
+                                                // How is IE11 so ahead of the curve?
+                                                elem.on('pointerdown', start).on('pointermove', onMove).on('pointerup', end).on('pointercancel',
+                                                        onEnd);
+                                            } else if(window.navigator.msPointerEnabled) {
+                                                // How is IE10 so shitty?
+                                                elem.on('MSPointerDown', start).on('MSPointerMove', onMove).on('MSPointerUp',
+                                                        end).on('MSPointerCancel', onEnd);
+                                            } else {
+                                                // normal browsers
+                                                $swipe.bind(elem, {
+                                                    start : start,
+                                                    move  : onMove,
+                                                    end   : end,
+                                                    cancel: onEnd
+                                                });
+                                            }
+                                        }
+
+                                        // bind the events to the low value range input
+                                        bindSlider(refs.minInput, refs.minPtr, refLow);
+
+                                        if(isDualKnob) {
+                                            // bind the events to the high value range input
+                                            bindSlider(refs.maxInput, refs.maxPtr, refHigh);
+                                            // bind the events to the selection bar range input
+                                            bindSlider(refs.selInput, refs.selBar, refSel);
+                                        }
+                                    } else {
+                                        // we're using normal DOM elements
+
+                                        /**
+                                         * Start event
+                                         * @param {object} elem
+                                         * @param {string} rf
+                                         * @param {object} [ptr]
+                                         */
+                                        function bindSwipeStart(elem, rf, ptr) {
+
+                                            // make sure the element has all the methods and properties we'll need
+                                            elem = angularize(elem);
+
+                                            // if no pointer reference is supplied, reference the element given
+                                            if(angular.isUndefined(ptr)) {
+                                                ptr = elem;
+                                            } else {
+                                                ptr = angularize(ptr);
+                                            }
+
+                                            // bind the swipe start event to the element
+                                            $swipe.bind(elem, {
+                                                start: function(ev) {
+                                                    onStart(ev, ptr, rf);
+                                                }
+                                            });
+                                        }
+
+                                        /**
+                                         * Move event
+                                         * @param {object} elem
+                                         */
+                                        function bindSwipe(elem) {
+
+                                            // make sure the element has all the methods and properties we'll need
+                                            elem = angularize(elem);
+
+                                            // bind the swipe move, end, and cancel events
+                                            $swipe.bind(elem, {
+                                                move  : onMove,
+                                                end   : function(ev) {
+                                                    onMove(ev);
+                                                    onEnd();
+                                                },
+                                                cancel: onEnd
+                                            });
+                                        }
+
+                                        // bind the common events to the various common elements
+                                        bindSwipe($document);
+                                        bindSwipeStart(refs.minPtr, refLow);
+                                        bindSwipeStart(refs.lowBub, refLow);
+                                        bindSwipeStart(refs.flrBub, refLow, refs.minPtr);
+                                        if(isDualKnob) {
+                                            // bind the dual knob specific events to the dual knob specific elements
+                                            bindSwipeStart(refs.maxPtr, refHigh);
+                                            bindSwipeStart(refs.highBub, refHigh);
+                                            bindSwipeStart(refs.ceilBub, refHigh, refs.maxPtr);
+                                            bindSwipeStart(refs.selBar, refSel);
+                                            bindSwipeStart(refs.selBub, refSel, refs.selBar);
+                                            bindSwipeStart(refs.unSelBarLow, refLow, refs.minPtr);
+                                            bindSwipeStart(refs.unSelBarHigh, refHigh, refs.maxPtr);
+                                        } else {
+                                            // bind the single knob specific events to the single knob specific elements
+                                            bindSwipeStart(refs.ceilBub, refLow, refs.minPtr);
+                                            bindSwipeStart(refs.fullBar, refLow, refs.minPtr);
+                                        }
+                                    }
+                                }
+
+                                // update the DOM
+                                setPointers();
+                                adjustBubbles();
+
+                                if(!eventsBound) {
+                                    // the events haven't been bound yet
+
+                                    // so bind the events, damnit!
+                                    setBindings();
+                                    eventsBound = true;
+                                }
+                            }
+
+                            // update the DOM when one of the watchables changes
+                            for(var i = 0; i < watchables.length; i++) {
+                                scope.$watch(watchables[i], function() {
+                                    updateDOM();
+                                });
+                            }
+
+                            // update the DOM when the window resizes
+                            angularize(window).bind("resize", function() {
+                                updateDOM();
+                            });
+
+                            // listen for a refresh event
+                            scope.$on('refreshSlider', function() {
+                                // update the DOM, but make sure everything has been digested first
+                                $timeout(function() {
+                                    updateDOM();
+                                });
+                            });
+
+                            // wait for everything to be digested then set up the DOM
+                            $timeout(function() {
+                                updateDOM();
+                            });
+                        }
+                    };
+                }
+            }
+        }
+        ]);

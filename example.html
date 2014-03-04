@@ -100,13 +100,11 @@
 		<h3>Dual Knob</h3>
 	    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' buffer='{{ buffer }}' stickiness='{{ stickiness }}' ng-model-low='values.low' ng-model-high='values.high' translate='translate' style="width: {{ sliderWidth }};"></slider>
 		Values: <input ng-model="values.low" type="text" /><input ng-model="values.high" type="text" />
-		<h2>w/ Scaling functions (y=x^2)</h2>
+		<h2>w/ Scaling functions (y=x^3)</h2>
 		<h3>Single Knob</h3>
-	    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' stickiness='{{ stickiness }}' ng-model='value2' scale='scale' inverse-scale='inverseScale' style="width: {{ sliderWidth }};"></slider>
-		Value: <input ng-model="value2" type="text" />
+	    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' stickiness='{{ stickiness }}' ng-model='value' scale='scale' inverse-scale='inverseScale' style="width: {{ sliderWidth }};"></slider>
 		<h3>Dual Knob</h3>
-	    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' buffer='{{ buffer }}' stickiness='{{ stickiness }}' ng-model-low='values2.low' ng-model-high='values2.high' scale='scale' inverse-scale='inverseScale' translate='translate' style="width: {{ sliderWidth }};"></slider>
-		Values: <input ng-model="values2.low" type="text" /><input ng-model="values2.high" type="text" />
+	    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' buffer='{{ buffer }}' stickiness='{{ stickiness }}' ng-model-low='values.low' ng-model-high='values.high' scale='scale' inverse-scale='inverseScale' translate='translate' style="width: {{ sliderWidth }};"></slider>
 		<h2>in ngRepeat</h2>
 		<div ng-repeat="scope in scopes">
 		    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' stickiness='{{ stickiness }}' ng-model='scope.value' style="width: {{ sliderWidth }};"></slider>
@@ -130,20 +128,15 @@
 			.controller('MainCtrl', ['$scope', function($scope) {
 			    $scope.scopes = [];
 			    $scope.value = 5;
-			    $scope.value2 = 5;
 				$scope.values = {
 				    low: 4,
 				    high: 7
 			    };
-			    $scope.values2 = {
-				    low: 4,
-				    high: 7
-			    };
 			    $scope.scale = function(value) {
-				    return Math.pow(value,2);
+				    return Math.pow(value,3);
 			    };
 			    $scope.inverseScale = function(value) {
-				    return Math.sqrt(value);
+				    return Math.pow(value,1/3);
 			    };
 			        
 			    $scope.addScope = function() {

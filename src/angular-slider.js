@@ -510,6 +510,10 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                 }
                                 return scope.inverseScale({value: value});
                             };
+                            
+                            if(Math.round(scope.encode(scope.decode(1))) != 1 || Math.round(scope.encode(scope.decode(100))) != 100) {
+                                console.warn("The scale and inverseScale functions are not perfect inverses: 1 = "+scope.encode(scope.decode(1))+"  100 = "+scope.encode(scope.decode(100)));
+                            }
 
                             /**
                              * Decode the value of the given reference
@@ -713,8 +717,8 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                             function updateDOM() {
 
                                 var dragRange,      // is the user dragging the entire range and not just one knob?
-                                    lowOffset,      // where did the low knob start
-                                    highOffset,     // where did the high knob start
+                                    lowValueOffset,      // where did the low knob start
+                                    highValueOffset,     // where did the high knob start
                                     pointer,        // which knob/bar is being dragged
                                     ref;            // which value should we be changing
 
@@ -732,6 +736,24 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                  */
                                 function percentFromOffset(offset) {
                                     return ((offset - minOffset) / offsetRange) * 100;
+                                }
+
+                                /**
+                                 * Get the decoded value from the given offset
+                                 * @param {number} offset
+                                 * @returns {number}
+                                 */
+                                function decodedValueFromOffset(offset) {
+                                    return percentFromOffset(offset)/100 * valueRangeDecoded + minValueDecoded;
+                                }
+
+                                /**
+                                 * Get the value from the given offset
+                                 * @param {number} offset
+                                 * @returns {number}
+                                 */
+                                function valueFromOffset(offset) {
+                                    return scope.encode(decodedValueFromOffset(offset));
                                 }
 
                                 /**
@@ -839,16 +861,22 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                     var rawLowPercent = percentFromDecodedValue(scope.decodedValues[refLow]);
 
                                     /**
-                                     * The width in percent of a step
+                                     * The width in percent of a step above the low value
                                      * @type {number}
                                      */
-                                    var stepWidthPercent = percentFromValue(scope[refLow] + scope.step) - rawLowPercent;
+                                    var stepWidthPercentAboveLow = percentFromValue(scope[refLow] + scope.step) - rawLowPercent;
 
                                     /**
-                                     * The width in percent of the buffer
+                                     * The width in percent of a step below the low value
                                      * @type {number}
                                      */
-                                    var bufferWidthPercent = percentFromValue(scope[refLow] + scope.buffer) - rawLowPercent;
+                                    var stepWidthPercentBelowLow = rawLowPercent - percentFromValue(scope[refLow] - scope.step);
+
+                                    /**
+                                     * The width in percent of the buffer above the low value
+                                     * @type {number}
+                                     */
+                                    var bufferWidthPercentLow = percentFromValue(scope[refLow] + scope.buffer) - rawLowPercent;
 
                                     /**
                                      * The width in percent of the pointer
@@ -860,7 +888,7 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                      * The percent for the low knob after the stretch has been applied
                                      * @type {number}
                                      */
-                                    var stretchedLowPercent = rawLowPercent + percentStretch(stickyOffsetLow, stepWidthPercent);
+                                    var stretchedLowPercent = rawLowPercent + percentStretch(stickyOffsetLow, stickyOffsetLow > 0?stepWidthPercentAboveLow:stepWidthPercentBelowLow);
 
                                     // set the low knob's and bubble's new positions
                                     offset(refs.minPtr, offsetFromPercent(stretchedLowPercent));
@@ -877,16 +905,34 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                         var rawHighPercent = percentFromDecodedValue(scope.decodedValues[refHigh]);
 
                                         /**
+                                         * The width in percent of a step above the high value
+                                         * @type {number}
+                                         */
+                                        var stepWidthPercentAboveHigh = percentFromValue(scope[refHigh] + scope.step) - rawHighPercent;
+
+                                        /**
+                                         * The width in percent of a step below the high value
+                                         * @type {number}
+                                         */
+                                        var stepWidthPercentBelowHigh = rawHighPercent - percentFromValue(scope[refHigh] - scope.step);
+
+                                        /**
+                                         * The width in percent of the buffer below the high value
+                                         * @type {number}
+                                         */
+                                        var bufferWidthPercentHigh = rawHighPercent - percentFromValue(scope[refHigh] - scope.buffer);
+
+                                        /**
                                          * The percent for the high knob after the stretch has been applied
                                          * @type {number}
                                          */
-                                        var stretchedHighPercent = rawHighPercent + percentStretch(stickyOffsetHigh, stepWidthPercent);
+                                        var stretchedHighPercent = rawHighPercent + percentStretch(stickyOffsetHigh, stickyOffsetHigh > 0?stepWidthPercentAboveHigh:stepWidthPercentBelowHigh);
 
-                                        if(stretchedLowPercent > rawHighPercent - bufferWidthPercent) {
+                                        if(stretchedLowPercent > rawHighPercent - bufferWidthPercentHigh) {
                                             // if the low knob has reached its maximum
 
                                             // get the new stretch amount for the low knob
-                                            stretchedLowPercent = rawLowPercent + percentStretch(stickyOffsetLow, bufferWidthPercent, true);
+                                            stretchedLowPercent = rawLowPercent + percentStretch(stickyOffsetLow, bufferWidthPercentLow, true);
 
                                             // and re-set the low knob's and bubble's new positions
                                             offset(refs.minPtr, offsetFromPercent(stretchedLowPercent));
@@ -894,11 +940,11 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                                                                                     pointerHalfWidth)));
                                         }
 
-                                        if(stretchedHighPercent < rawLowPercent + bufferWidthPercent) {
+                                        if(stretchedHighPercent < rawLowPercent + bufferWidthPercentLow) {
                                             // if the high knob has reached its minimum
 
                                             // get the new stretch amount for the high knob
-                                            stretchedHighPercent = rawHighPercent + percentStretch(stickyOffsetHigh, bufferWidthPercent, true);
+                                            stretchedHighPercent = rawHighPercent + percentStretch(stickyOffsetHigh, bufferWidthPercentHigh, true);
                                         }
 
                                         // set the high knob's and bubble's new positions
@@ -936,11 +982,11 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                             // we're using range inputs
 
                                             // get the high input's new position
-                                            var maxInputLowPercent = stretchedLowPercent + (bufferWidthPercent / 2);
+                                            var maxInputLowPercent = stretchedLowPercent + (bufferWidthPercentLow / 2);
 
                                             // set the low input's new width
                                             refs.minInput.css({
-                                                width: offsetFromPercent(stretchedHighPercent - (bufferWidthPercent / 2))
+                                                width: offsetFromPercent(stretchedHighPercent - (bufferWidthPercentLow / 2))
                                             });
 
                                             // set the high input's new position and width
@@ -1003,6 +1049,7 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
 
                                             // and hide the center bubble
                                             hide(refs.cmbBub);
+                                            bubToAdjust = refs.highBub;
                                         }
                                     }
 
@@ -1116,49 +1163,43 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                                  * The new offset for the low knob
                                                  * @type {number}
                                                  */
-                                                var newLow = currentX - lowOffset;
+                                                var newLowValue = valueFromOffset(currentX) - lowValueOffset;
 
                                                 /**
                                                  * The new offset for the high knob
                                                  * @type {number}
                                                  */
-                                                var newHigh = currentX + highOffset;
+                                                var newHighValue = valueFromOffset(currentX) + highValueOffset;
 
-                                                if(newLow < minOffset) {
+                                                if(newLowValue < minValue) {
                                                     // the new low is outside of the slider
 
                                                     // so bring the values back within range
-                                                    newHigh += minOffset - newLow;
-                                                    newLow = minOffset;
-                                                } else if(newHigh > maxOffset) {
+                                                    newHighValue += minValue - newLowValue;
+                                                    newLowValue = minValue;
+                                                } else if(newHighValue > maxValue) {
                                                     // the new high value is outside of the slider
 
                                                     // so bring the values back within range
-                                                    newLow -= newHigh - maxOffset;
-                                                    newHigh = maxOffset;
+                                                    newLowValue -= newHighValue - maxValue;
+                                                    newHighValue = maxValue;
                                                 }
 
                                                 // get the offset percentages
-                                                newLow = percentFromOffset(newLow);
-                                                newHigh = percentFromOffset(newHigh);
+                                                var newLowPercent = percentFromValue(newLowValue);
+                                                var newHighPercent = percentFromValue(newHighValue);
 
                                                 // save the temporary sticky offset
-                                                stickyOffsetLow = newLow;
+                                                stickyOffsetLow = newLowPercent;
+                                                stickyOffsetHigh = newHighPercent;
 
-                                                // get the new raw values
-                                                newLow = minValueDecoded + (valueRangeDecoded * newLow / 100.0);
-                                                newHigh = minValueDecoded + (valueRangeDecoded * newHigh / 100.0);
+                                                // round the raw values to steps and assign them to the knobs
+                                                scope[refLow] = newLowValue = roundStep(newLowValue, scope.precision, scope.step, scope.floor, scope.ceiling);
+                                                scope[refHigh] = newHighValue = roundStep(newHighValue, scope.precision, scope.step, scope.floor, scope.ceiling);
 
-                                                // round the raw values to steps
-                                                newLow = roundStep(scope.encode(newLow), scope.precision, scope.step, scope.floor, scope.ceiling);
-                                                newHigh = roundStep(scope.encode(newHigh), scope.precision, scope.step, scope.floor, scope.ceiling);
-
-                                                // assign the new values to the knobs
-                                                scope[refLow] = newLow;
-                                                scope[refHigh] = newHigh;
-
-                                                // keep the offsets of both knobs the same
-                                                stickyOffsetLow = stickyOffsetHigh = stickyOffsetLow - percentFromValue(newLow);
+                                                // keep the difference between both knobs the same
+                                                stickyOffsetLow = stickyOffsetLow - percentFromValue(newLowValue);
+                                                stickyOffsetHigh = stickyOffsetHigh- percentFromValue(newHighValue);
                                             } else {
                                                 // only one knob is being dragged
 
@@ -1304,10 +1345,12 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
 
                                         // so tell everyone else this is the case
                                         dragRange = true;
+                                        
+                                        var startValue = valueFromOffset(currentX);
 
                                         // and save the start positions
-                                        lowOffset = currentX - offsetFromDecodedValue(scope.decodeRef(refLow)) - halfWidth(refs.minPtr);
-                                        highOffset = offsetFromDecodedValue(scope.decodeRef(refHigh)) - currentX + halfWidth(refs.maxPtr);
+                                        lowValueOffset = startValue - scope[refLow];
+                                        highValueOffset = scope[refHigh] - startValue;
                                     }
 
                                     // round the value to a step and assign the value

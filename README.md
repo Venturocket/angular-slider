@@ -5,20 +5,25 @@ License: MIT
 ## Features
 - Single or dual knob
 - Fully Stylable
+- Custom arbitrary scaling
 - Adjustable knob "Stickiness"
 - Adjustable minimum range width
-- Draggable range
-- Touch and IE10+/Win8 pointer event support
+- Draggable selection range
+- Full touch and IE10+/Win8+ pointer event support
 
 ## Known Issues
 - Doesn't work in IE8-
 
+## Installation
+```
+bower install venturocket-angular-slider
+```
+
 ## Usage
 ### Requirements
 ```html
-<script src="lib/modernizr.custom.72715.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.3/angular.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.3/angular-touch.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular-touch.min.js"></script>
 <script src="build/angular-slider.min.js"></script>
 ```
 ### Single Knob
@@ -26,80 +31,109 @@ License: MIT
 As an element:
 ```html
 <slider
-	ng-model="{string}"
-	floor="{float}"
-	ceiling="{float}"
-	step="{float}"
-	precision="{integer}"
-	stretch="{integer}"
-	translate="{string}">
+    ng-model="{string}"
+    floor="{float}"
+    ceiling="{float}"
+    step="{float}"
+    precision="{integer}"
+    stretch="{integer}"
+    translate="{string}"
+    scale="{string}"
+    inverse-scale="{string}">
 </slider>
 ```
 As an attribute:
 ```html
 <div
-	slider
-	ng-model="{string}"
-	floor="{float}"
-	ceiling="{float}"
-	step="{float}"
-	precision="{integer}"
-	stretch="{integer}"
-	translate="{string}">
+    slider
+    ng-model="{string}"
+    floor="{float}"
+    ceiling="{float}"
+    step="{float}"
+    precision="{integer}"
+    stretch="{integer}"
+    translate="{string}"
+    scale="{string}"
+    inverse-scale="{string}">
 </div>
 ```
 
 #### Parameters
-|Param		|Type	|Details|
-|-----------|-------|-------|
-|ng-model	|string	|Assignable angular expression to which to data-bind the value. |
-|floor		|float	|The lowest value possible |
-|ceiling	|float	|The highest value possible |
-|step		|float (optional) |The width between each tick. Default: infinite |
-|precision	|integer (optional) |The numerical precision to which to round the value. Default: 0 |
-|stretch	|integer (optional) |How stretch resistant the knobs will act. The higher the stretch resistance the more "snappy" the knobs will feel. Default: 3 |
-|translate	|string (optional) |A translation function to apply to all view values. Be sure to omit the parentheses (e.g. "transFunc" instead of "transFunc()") |
+|Param      |Type   |Required |Default |Details |
+|-----------|-------|---------|--------|--------|
+|ng-model   |string |Yes      |none    |Assignable angular expression to which to data-bind the value. |
+|floor      |float  |Yes      |none    |The lowest value possible |
+|ceiling    |float  |Yes      |none    |The highest value possible |
+|step       |float  |No       |inf     |The width between each tick. |
+|precision  |integer|No       |0       |The numerical precision to which to round the value. |
+|stretch    |integer|No       |3       |How sticky the knobs will act. 1 = no stickiness |
+|translate  |string |No       |none    |A translation function to apply to all view values. Be sure to omit the parentheses (e.g. "transFunc" instead of "transFunc()") |
+|scale      |string |No       |none    |A scaling function to apply to the value. See the `Scaling` section below for more details. |
+|inverse-scale |string|No     |none    |The inverse of the scaling function. This is required if a scaling function is specified. See the `Scaling` section below for more details. |
 --
 ### Dual Knob
 #### Markup
 As an element:
 ```html
 <slider
-	ng-model-low="{string}"
-	ng-model-high="{string}"
-	floor="{float}"
-	ceiling="{float}"
-	step="{float}"
-	precision="{integer}"
-	stretch="{integer}"
-	translate="{string}">
+    ng-model-low="{string}"
+    ng-model-high="{string}"
+    floor="{float}"
+    ceiling="{float}"
+    step="{float}"
+    precision="{integer}"
+    stretch="{integer}"
+    translate="{string}"
+    scale="{string}"
+    inverse-scale="{string}">
 </slider>
 ```
 As an attribute:
 ```html
 <div
-	slider
-	ng-model-low="{string}"
-	ng-model-high="{string}"
-	floor="{float}"
-	ceiling="{float}"
-	step="{float}"
-	buffer="{float}"
-	precision="{integer}"
-	stretch="{integer}"
-	translate="{string}">
+    slider
+    ng-model-low="{string}"
+    ng-model-high="{string}"
+    floor="{float}"
+    ceiling="{float}"
+    step="{float}"
+    buffer="{float}"
+    precision="{integer}"
+    stretch="{integer}"
+    translate="{string}"
+    scale="{string}"
+    inverse-scale="{string}">
 </div>
 ```
 
 #### Parameters
-|Param		|Type	|Details|
-|-----------|-------|-------|
-|ng-model-low	|string	|Assignable angular expression to which to data-bind the low value. |
-|ng-model-high	|string	|Assignable angular expression to which to data-bind the high value. |
-|floor		|float	|The lowest value possible |
-|ceiling	|float	|The highest value possible |
-|step		|float (optional) |The width between each tick. Default: infinite |
-|buffer		|float (optional) |The minimum difference between the low and high values. Default: 0 |
-|precision	|integer (optional) |The numerical precision to which to round the value. Default: 0 |
-|stretch	|integer (optional) |How stretch resistant the knobs will act. The higher the stretch resistance the more "snappy" the knobs will feel. Default: 3 |
-|translate	|string (optional) |A translation function to apply to all view values. Be sure to omit the parentheses (e.g. "transFunc" instead of "transFunc()") |
+|Param      |Type   |Required |Default |Details |
+|-----------|-------|---------|--------|--------|
+|ng-model-low|string|Yes      |none    |Assignable angular expression to which to data-bind the low value. |
+|ng-model-high|string|Yes     |none    |Assignable angular expression to which to data-bind the high value. |
+|floor      |float  |Yes      |none    |The lowest value possible |
+|ceiling    |float  |Yes      |none    |The highest value possible |
+|step       |float  |No       |inf     |The width between each tick. |
+|precision  |integer|No       |0       |The numerical precision to which to round the value. |
+|stretch    |float  |No       |3       |How sticky the knobs will act. 1 = no stickiness |
+|translate  |string |No       |none    |A translation function to apply to all view values. Be sure to omit the parentheses (e.g. "transFunc" instead of "transFunc()") |
+|scale      |string |No       |none    |A scaling function to apply to the value. See the `Scaling` section below for more details. |
+|inverse-scale|string|No      |none    |The inverse of the scaling function. This is required if a scaling function is specified. See the `Scaling` section below for more details. |
+
+
+## Scaling
+You can supply any arbitrary scaling function (and its inverse) to the slider to suit your needs. 
+The inverse scaling function MUST be specified if a scaling function is specified (and vice versa).
+The scaling/inverse function can be pretty much anything as long as they take a number as a parameter and return a number. Like this:
+```javascript
+function scale(value) {
+    return Math.pow(value,3);
+}
+function inverseScale(value) {
+    return Math.pow(value,1/3);
+}
+```
+A few notes:
+- scale(inverseScale(x)) MUST produce x or you're gonna have a bad time
+- If your scale function returns the same value for multiple values within the range of the slider you're gonna have a bad time
+- If the floor of your slider dips into negative numbers you're (probably) gonna have a bad time

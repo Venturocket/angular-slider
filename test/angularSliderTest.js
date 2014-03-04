@@ -686,10 +686,10 @@ describe("Unit: Slider Directive", function() {
                 input.trigger($.Event('mouseup',{clientX: 100}));
                 
                 expect($rootScope.skill.values.low).toBe(1.00);
-                expect($rootScope.skill.values.high).toBe(9.00);
+                expect($rootScope.skill.values.high).toBe(13.00);
                 
                 expect($(element).find('.bubble.low').text()).toBe('1.00');
-                expect($(element).find('.bubble.high').text()).toBe('9.00');
+                expect($(element).find('.bubble.high').text()).toBe('13.00');
             });
             
         });
