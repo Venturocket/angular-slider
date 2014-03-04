@@ -68,8 +68,8 @@ As an attribute:
 |precision  |integer|No       |0       |The numerical precision to which to round the value. |
 |stretch    |integer|No       |3       |How sticky the knobs will act. 1 = no stickiness |
 |translate  |string |No       |none    |A translation function to apply to all view values. Be sure to omit the parentheses (e.g. "transFunc" instead of "transFunc()") |
-|scale      |string |No       |none    |A scaling function to apply to the value. See the `Scaling` section below for more details. |
-|inverse-scale |string|No     |none    |The inverse of the scaling function. This is required if a scaling function is specified. See the `Scaling` section below for more details. |
+|scale      |string |No       |none    |A scaling function to apply to the value. See the `Scaling` section below for more details. Be sure to omit the parentheses (e.g. "scaleFunc" instead of "scaleFunc()") |
+|inverse-scale |string|No     |none    |The inverse of the scaling function. This is required if a scaling function is specified. See the `Scaling` section below for more details. Be sure to omit the parentheses (e.g. "scaleFunc" instead of "scaleFunc()") |
 --
 ### Dual Knob
 #### Markup
@@ -84,6 +84,8 @@ As an element:
     precision="{integer}"
     stretch="{integer}"
     translate="{string}"
+    translateRange="{string}"
+    translateCombined="{string}"
     scale="{string}"
     inverse-scale="{string}">
 </slider>
@@ -101,6 +103,8 @@ As an attribute:
     precision="{integer}"
     stretch="{integer}"
     translate="{string}"
+    translateRange="{string}"
+    translateCombined="{string}"
     scale="{string}"
     inverse-scale="{string}">
 </div>
@@ -116,9 +120,11 @@ As an attribute:
 |step       |float  |No       |inf     |The width between each tick. |
 |precision  |integer|No       |0       |The numerical precision to which to round the value. |
 |stretch    |float  |No       |3       |How sticky the knobs will act. 1 = no stickiness |
-|translate  |string |No       |none    |A translation function to apply to all view values. Be sure to omit the parentheses (e.g. "transFunc" instead of "transFunc()") |
-|scale      |string |No       |none    |A scaling function to apply to the value. See the `Scaling` section below for more details. |
-|inverse-scale|string|No      |none    |The inverse of the scaling function. This is required if a scaling function is specified. See the `Scaling` section below for more details. |
+|translate  |string |No       |none    |A translation function to apply to most of the view values. Be sure to omit the parentheses (e.g. "transFunc" instead of "transFunc()") |
+|translate-range|string|No    |none    |A translation function to apply to the range value. Be sure to omit the parentheses (e.g. "transFunc" instead of "transFunc()") |
+|translate-combined|string|No |none    |A translation function to apply to the combined value (when the knobs are too close together). Be sure to omit the parentheses (e.g. "transFunc" instead of "transFunc()") |
+|scale      |string |No       |none    |A scaling function to apply to the value. See the `Scaling` section below for more details. Be sure to omit the parentheses (e.g. "scaleFunc" instead of "scaleFunc()") |
+|inverse-scale|string|No      |none    |The inverse of the scaling function. This is required if a scaling function is specified. See the `Scaling` section below for more details. Be sure to omit the parentheses (e.g. "scaleFunc" instead of "scaleFunc()") |
 
 
 ## Scaling
