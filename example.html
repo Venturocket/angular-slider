@@ -6,10 +6,10 @@
     <style>
 
 	slider {
-		display:        block;
-		position:       relative;
-		height:         30px;
-		width:          500px;
+		display:     block;
+		position:    relative;
+		height:      30px;
+		width:       500px;
 	}
 
 	slider span.bar {
@@ -17,8 +17,8 @@
 		z-index:    0;
 		background: #eee;
 		left:       0;
-		top: 25%;
-		cursor: pointer;
+		top:        25%;
+		cursor:     pointer;
 	}
 
 	slider span.bar.selection, slider span.bar.unselected {
@@ -56,7 +56,7 @@
 		text-align:  center;
 		text-shadow: none;
 		top:         -1.3em;
-		cursor: pointer;
+		cursor:      pointer;
 	}
 
 	slider span.bubble.selection, slider span.bubble.limit {
@@ -74,11 +74,11 @@
 
 	#slider-container {
 		-webkit-touch-callout: none;
-		-webkit-user-select: none;
-		-khtml-user-select: none;
-		-moz-user-select: -moz-none;
-		-ms-user-select: none;
-		user-select: none;
+		-webkit-user-select:   none;
+		-khtml-user-select:    none;
+		-moz-user-select:      -moz-none;
+		-ms-user-select:       none;
+		user-select:           none;
 	}
 
     </style>
@@ -86,30 +86,37 @@
 <body id='ng-app' ng-app="ExampleApp">
 
 	<div id='slider-container' ng-controller="MainCtrl">
-		Floor: <input type='text' ng-model='floor' ng-init='floor = 1' /><br/>
-		Ceiling: <input type='text' ng-model='ceiling' ng-init='ceiling = 10' /><br/>
-		Step Width: <input type='text' ng-model='step' ng-init='step = 1' /><br/>
-		Precision: <input type='text' ng-model='precision' ng-init='precision = 2' /><br/>
-		Buffer: <input type='text' ng-model='buffer' ng-init='buffer = 2' /><br/>
-		Stickiness: <input type='text' ng-model='stickiness' ng-init='stickiness = 3' /><br/>
+		Floor: <input type='text' ng-model='floor' ng-init='floor = 1' /><br />
+		Ceiling: <input type='text' ng-model='ceiling' ng-init='ceiling = 10' /><br />
+		Step Width: <input type='text' ng-model='step' ng-init='step = 1' /><br />
+		Precision: <input type='text' ng-model='precision' ng-init='precision = 2' /><br />
+		Buffer: <input type='text' ng-model='buffer' ng-init='buffer = 2' /><br />
+		Stickiness: <input type='text' ng-model='stickiness' ng-init='stickiness = 3' /><br />
 		Slider Widths: <input type="text" ng-model="sliderWidth" ng-init="sliderWidth = '500px'" ng-change="fireResizeEvent()" />
 		<h2>Normal</h2>
 		<h3>Single Knob</h3>
-	    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' stickiness='{{ stickiness }}' ng-model='value' style="width: {{ sliderWidth }};"></slider>
+	    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' stickiness='{{ stickiness }}'
+	            ng-model='value' style="width: {{ sliderWidth }};"></slider>
 		Value: <input ng-model="value" type="text" />
 		<h3>Dual Knob</h3>
-	    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' buffer='{{ buffer }}' stickiness='{{ stickiness }}' ng-model-low='values.low' ng-model-high='values.high' translate='translate' translate-range='translateRange' translate-combined='translateCombined' style="width: {{ sliderWidth }};"></slider>
+	    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' buffer='{{ buffer }}'
+	            stickiness='{{ stickiness }}' ng-model-low='values.low' ng-model-high='values.high' translate='translate'
+	            translate-range='translateRange' translate-combined='translateCombined' style="width: {{ sliderWidth }};"></slider>
 		Values: <input ng-model="values.low" type="text" /><input ng-model="values.high" type="text" />
 		<h2>w/ Scaling functions (y=x^3)</h2>
 		<h3>Single Knob</h3>
-	    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' stickiness='{{ stickiness }}' ng-model='value' scale='scale' inverse-scale='inverseScale' style="width: {{ sliderWidth }};"></slider>
+	    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' stickiness='{{ stickiness }}'
+	            ng-model='value' scale='scale' inverse-scale='inverseScale' style="width: {{ sliderWidth }};"></slider>
 		<h3>Dual Knob</h3>
-	    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' buffer='{{ buffer }}' stickiness='{{ stickiness }}' ng-model-low='values.low' ng-model-high='values.high' scale='scale' inverse-scale='inverseScale' translate='translate' style="width: {{ sliderWidth }};"></slider>
+	    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' buffer='{{ buffer }}'
+	            stickiness='{{ stickiness }}' ng-model-low='values.low' ng-model-high='values.high' scale='scale' inverse-scale='inverseScale'
+	            translate='translate' style="width: {{ sliderWidth }};"></slider>
 		<h2>in ngRepeat</h2>
 		<div ng-repeat="scope in scopes">
-		    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' stickiness='{{ stickiness }}' ng-model='scope.value' style="width: {{ sliderWidth }};"></slider>
+		    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' stickiness='{{ stickiness }}'
+		            ng-model='scope.value' style="width: {{ sliderWidth }};"></slider>
 		</div>
-		<button type="button" ng-click="addScope()">Add Slider</button><br/>
+		<button type="button" ng-click="addScope()">Add Slider</button><br />
     </div>
 	<script src="app/components/angular/angular.js"></script>
 	<script src="app/components/angular-touch/angular-touch.js"></script>
@@ -118,53 +125,52 @@
     <script>
 	    function dump(obj) {
 		    var out = '';
-		    for (var i in obj) {
-		        out += i + ": " + obj[i] + "\n";
+		    for(var i in obj) {
+			    out += i + ": " + obj[i] + "\n";
 		    }
-		
+
 		    return out;
-		}
-        angular.module('ExampleApp', ['vr.directives.slider'])
-			.controller('MainCtrl', ['$scope', function($scope) {
-			    $scope.scopes = [];
-			    $scope.value = 5;
-				$scope.values = {
-				    low: 4,
-				    high: 7
-			    };
-			    $scope.scale = function(value) {
-				    return Math.pow(value,3);
-			    };
-			    $scope.inverseScale = function(value) {
-				    return Math.pow(value,1/3);
-			    };
-			        
-			    $scope.addScope = function() {
-				    $scope.scopes.push({
-					    values: {
-					        low : 4,
-					        high: 7
-					    },
-					    value: 5
-				    });
-			    };
-			        
-			    $scope.translate = function(value) {
-				    return '$'+value;
-			    };
-			        
-			    $scope.translateCombined = function(low, high) {
-				    return $scope.translate(low) + " *** " + $scope.translate(high);
-			    };
-			        
-			    $scope.translateRange = function(low, high) {
-				    return $scope.translate(high-low);
-			    };
-			        
-			    $scope.fireResizeEvent = function() {
-				    $scope.$broadcast('refreshSlider');
-			    };
-			}]);
+	    }
+	    angular.module('ExampleApp', ['vr.directives.slider']).controller('MainCtrl', ['$scope', function($scope) {
+		    $scope.scopes = [];
+		    $scope.value = 5;
+		    $scope.values = {
+			    low : 4,
+			    high: 7
+		    };
+		    $scope.scale = function(value) {
+			    return Math.pow(value, 3);
+		    };
+		    $scope.inverseScale = function(value) {
+			    return Math.pow(value, 1 / 3);
+		    };
+
+		    $scope.addScope = function() {
+			    $scope.scopes.push({
+				    values: {
+					    low : 4,
+					    high: 7
+				    },
+				    value : 5
+			    });
+		    };
+
+		    $scope.translate = function(value) {
+			    return '$' + value;
+		    };
+
+		    $scope.translateCombined = function(low, high) {
+			    return $scope.translate(low) + " *** " + $scope.translate(high);
+		    };
+
+		    $scope.translateRange = function(low, high) {
+			    return $scope.translate(high - low);
+		    };
+
+		    $scope.fireResizeEvent = function() {
+			    $scope.$broadcast('refreshSlider');
+		    };
+	    }]);
     </script>
 </body>
 </html>

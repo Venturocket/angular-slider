@@ -1182,12 +1182,8 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                         });
 
                                         // set the selection bubbles' new positions
-                                        offset(refs.selBub, offsetFromPercent(stretchedLowPercent +
-                                                                              percentFromOffset(halfWidth(refs.selBar) - halfWidth(refs.selBub) +
-                                                                                                minOffset)));
-                                        offset(refs.cmbBub, offsetFromPercent(stretchedLowPercent +
-                                                                              percentFromOffset(halfWidth(refs.selBar) - halfWidth(refs.cmbBub) +
-                                                                                                minOffset)));
+                                        offset(refs.selBub, offsetFromPercent(((stretchedLowPercent + stretchedHighPercent) / 2) - percentFromOffset(halfWidth(refs.selBub) + minOffset) + ptrHalfWidthPercent));
+                                        offset(refs.cmbBub, offsetFromPercent(((stretchedLowPercent + stretchedHighPercent) / 2) - percentFromOffset(halfWidth(refs.cmbBub) + minOffset) + ptrHalfWidthPercent));
 
                                         // set the low unselected bar's new position and width
                                         refs.unSelBarLow.css({
