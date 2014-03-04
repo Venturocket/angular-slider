@@ -217,9 +217,9 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                     ngModelHigh      : '=',   // dual knob high value binding
                     translate        : '&',   // how to translate the values displayed in the bubbles
                     translateRange   : '&',   // how to translate the range bubble
-                    translateCombined: '&',   // how to translate the center bubble 
+                    translateCombined: '&',   // how to translate the combined bubble 
                     scale            : '&',   // how to scale the values
-                    inverseScale          : '&'    // how to unscale the values
+                    inverseScale     : '&'    // how to unscale the values
                 },
                 template: // bar background
                     "<span class='bar full'></span>" + // secondary bars used for dual knobs
@@ -321,7 +321,7 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
 
                     // set up the translation function for the center bubble
                     if(attributes.translateCombined) {
-                        attributes.$set('translateCenter', "" + attributes.translateCombined + "(low,high)");
+                        attributes.$set('translateCombined', "" + attributes.translateCombined + "(low,high)");
                     }
 
                     // set up the encoding function
@@ -467,7 +467,7 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                 low = parseFloat(low).toFixed(scope.precision);
                                 high = parseFloat(high).toFixed(scope.precision);
                                 if(angular.isUndefined(attributes.translateRange)) {
-                                    return "Range: " + scope.translate({value: parseFloat((high - low).toFixed(scope.precision))});
+                                    return "Range: " + scope.translation({value: parseFloat((high - low).toFixed(scope.precision))});
                                 }
                                 return scope.translateRange({low: low, high: high});
                             };
@@ -481,8 +481,8 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                             scope.combinedTranslation = function(low, high) {
                                 low = parseFloat(low).toFixed(scope.precision);
                                 high = parseFloat(high).toFixed(scope.precision);
-                                if(angular.isUndefined(attributes.translateRange)) {
-                                    return scope.translate({value: low}) + " - " + scope.translate({value: high});
+                                if(angular.isUndefined(attributes.translateCombined)) {
+                                    return scope.translation(low) + " - " + scope.translation(high);
                                 }
                                 return scope.translateCombined({low: low, high: high});
                             };
@@ -631,8 +631,13 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                         // this is the low or high value so bring them back in line with the steps
                                         scope[watchable] = roundStep(scope[watchable], scope.precision, scope.step, scope.floor, scope.ceiling);
                                     } else if(watchable == 'buffer') {
-                                        // this is the buffer so make sure it aligns with the steps
-                                        scope.buffer = stepBuffer(scope.step, scope.buffer);
+                                        if(!scope.buffer || isNaN(scope.buffer) || scope.buffer < 0) {
+                                            // the buffer is not valid, so set to 0
+                                            scope.buffer = 0;
+                                        } else {
+                                            // this is the buffer so make sure it aligns with the steps
+                                            scope.buffer = stepBuffer(scope.step, scope.buffer);
+                                        }
                                     } else if(watchable == 'precision') {
                                         // make sure the precision is valid
                                         if(!scope.precision || isNaN(scope.precision)) {
@@ -980,25 +985,30 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
 
                                         if(AngularSlider.inputtypes.range) {
                                             // we're using range inputs
-
+                                            
+                                            var ptrWidth = ptrHalfWidthPercent * 2;
+                                            
                                             // get the high input's new position
-                                            var maxInputLowPercent = stretchedLowPercent + (bufferWidthPercentLow / 2);
-
+                                            var highInputMinPercent = stretchedLowPercent + (bufferWidthPercentLow / 2);
+                                            
+                                            // get the low input's new width
+                                            var lowInputMaxPercent = stretchedHighPercent - (bufferWidthPercentHigh / 2);
+                                            
                                             // set the low input's new width
                                             refs.minInput.css({
-                                                width: offsetFromPercent(stretchedHighPercent - (bufferWidthPercentLow / 2))
+                                                width: offsetFromPercent(lowInputMaxPercent)
                                             });
 
                                             // set the high input's new position and width
                                             refs.maxInput.css({
-                                                left : offsetFromPercent(maxInputLowPercent + (ptrHalfWidthPercent * 2)),
-                                                width: offsetFromPercent(100 - maxInputLowPercent)
+                                                left : offsetFromPercent(highInputMinPercent + ptrWidth),
+                                                width: offsetFromPercent(100 - highInputMinPercent)
                                             });
 
                                             // set the selection input's new position and width
                                             refs.selInput.css({
-                                                left : offsetFromPercent(stretchedLowPercent + (ptrHalfWidthPercent * 2)),
-                                                width: offsetFromPercent(stretchedHighPercent - stretchedLowPercent - (ptrHalfWidthPercent * 2))
+                                                left : offsetFromPercent(stretchedLowPercent + ptrWidth),
+                                                width: offsetFromPercent(stretchedHighPercent - stretchedLowPercent - ptrWidth)
                                             });
                                         }
                                     }
@@ -1260,13 +1270,21 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
 
                                                                 // so set the low value to what the high used to be
                                                                 scope[refLow] = scope[refHigh];
+                                                                
+                                                                // make sure the decoded values are updated
+                                                                scope.decodedValues[refLow] = scope.decodeRef(refLow);
 
-                                                                // switch the reference
+                                                                // switch the value reference
                                                                 ref = refHigh;
+                                                                
+                                                                // swap the element references
+                                                                var temp = refs.minPtr;
+                                                                refs.minPtr = refs.maxPtr;
+                                                                refs.maxPtr = temp;
 
                                                                 // and the classes
-                                                                refs.minPtr.removeClass('active');
-                                                                refs.maxPtr.addClass('active');
+                                                                refs.maxPtr.removeClass('active').removeClass('high').addClass('low');
+                                                                refs.minPtr.addClass('active').removeClass('low').addClass('high');
                                                             }
                                                         } else {
                                                             // the high knob is being dragged
@@ -1276,13 +1294,21 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
 
                                                                 // so set the high value to what the low used to be
                                                                 scope[refHigh] = scope[refLow];
+                                                                
+                                                                // make sure the decoded values are updated
+                                                                scope.decodedValues[refHigh] = scope.decodeRef(refHigh);
 
-                                                                // switch the references
+                                                                // switch the value reference
                                                                 ref = refLow;
+                                                                
+                                                                // swap the element references
+                                                                var temp = refs.minPtr;
+                                                                refs.minPtr = refs.maxPtr;
+                                                                refs.maxPtr = temp;
 
                                                                 // and the classes
-                                                                refs.maxPtr.removeClass('active');
-                                                                refs.minPtr.addClass('active');
+                                                                refs.minPtr.removeClass('active').removeClass('low').addClass('high');
+                                                                refs.maxPtr.addClass('active').removeClass('high').addClass('low');
                                                             }
                                                         }
                                                     }
@@ -1290,12 +1316,18 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
 
                                                 // round the new value and assign it
                                                 scope[ref] = newValue = roundStep(newValue, scope.precision, scope.step, scope.floor, scope.ceiling);
+                                                
+                                                // update the decoded value
+                                                scope.decodedValues[ref] = scope.decodeRef(ref);
 
                                                 if(ref === refLow) {
                                                     // the low knob is being dragged
 
                                                     // so update the sticky offset for the low knob
                                                     stickyOffsetLow = stickyOffsetLow - percentFromValue(newValue);
+                                                    
+                                                    // and ensure the high knob stays put
+                                                    stickyOffsetHigh = 0;
                                                 } else {
                                                     // the high knob is being dragged
 
