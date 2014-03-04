@@ -18,7 +18,7 @@ describe("Unit: Slider Directive", function() {
 	describe('without range inputs and', function() {
 		
 		beforeEach(function() {
-			AngularSlider = { rangeInputs: false };
+			AngularSlider = { inputtypes: { range: false } };
 		});
 		
 		describe('non-range data', function() {
@@ -117,7 +117,7 @@ describe("Unit: Slider Directive", function() {
 		describe('range data', function() {
 
 			beforeEach(function() {
-				AngularSlider = { rangeInputs: false };
+				AngularSlider = { inputtypes: { range: false } };
 				$rootScope.skill = {
 					low: 2,
                     high: 2.5
@@ -320,7 +320,7 @@ describe("Unit: Slider Directive", function() {
 	describe('with range inputs and', function() {
 		
 		beforeEach(function() {
-			AngularSlider = { rangeInputs: true };
+			AngularSlider = { inputtypes: { range: true } };
 		});
 		
 		describe('non-range data', function() {
@@ -629,7 +629,7 @@ describe("Unit: Slider Directive", function() {
     describe("with a scaling function", function() {
         
         beforeEach(function() {
-            AngularSlider = { rangeInputs: true };
+            AngularSlider = { inputtypes: { range: true } };
             $rootScope.skill = {
                 value: 1.5,
                 values: {
@@ -698,7 +698,7 @@ describe("Unit: Slider Directive", function() {
     describe("in an ngRepeat", function() {
         
         beforeEach(function() {
-			AngularSlider = { rangeInputs: true };
+			AngularSlider = { inputtypes: { range: true } };
             $rootScope.skills = [
                 {
                     floor: 1,
@@ -743,7 +743,7 @@ describe("Unit: Slider Directive", function() {
     describe("with stickiness", function() {
         
         beforeEach(function() {
-			AngularSlider = { rangeInputs: true };
+			AngularSlider = { inputtypes: { range: true } };
             $rootScope.skill = 1.5;
             element = $compile("<slider floor='1' ceiling='3' stickiness='4' precision='2' step='0.5' ng-model='skill'></slider>")($rootScope);
             $rootScope.$digest();

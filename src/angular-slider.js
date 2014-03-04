@@ -341,7 +341,7 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                     });
 
                     // set up range inputs
-                    if(AngularSlider.rangeInputs) {
+                    if(AngularSlider.inputtypes.range) {
                         // we can use range inputs
 
                         /**
@@ -426,7 +426,7 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                     return {
                         post: function(scope, element, attributes) {
                             // re-set references locally to avoid any cross contamination and disassociation when using transcluded scopes (namely ng-repeat)
-                            var refs = setReferences(getReferences(element), isDualKnob, AngularSlider.rangeInputs);
+                            var refs = setReferences(getReferences(element), isDualKnob, AngularSlider.inputtypes.range);
 
                             /**
                              * Save the decoded values so we don't have to decode every...single...time....ugh
@@ -978,7 +978,7 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                             right: 0
                                         });
 
-                                        if(AngularSlider.rangeInputs) {
+                                        if(AngularSlider.inputtypes.range) {
                                             // we're using range inputs
 
                                             // get the high input's new position
@@ -1371,7 +1371,7 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                  * Bind the various events to the various DOM elements
                                  */
                                 function setBindings() {
-                                    if(AngularSlider.rangeInputs) {
+                                    if(AngularSlider.inputtypes.range) {
                                         // we're using range inputs
 
                                         /**
