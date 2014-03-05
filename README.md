@@ -1,5 +1,5 @@
 # angular-slider [![Build Status](https://secure.travis-ci.org/Venturocket/angular-slider.png?branch=master)](http://travis-ci.org/Venturocket/angular-slider)
-Slider directive for AngularJS. Based on: http://github.com/prajwalkman/angular-slider with some enhancements  
+Slider directive for AngularJS.
 License: MIT
 
 ## Features

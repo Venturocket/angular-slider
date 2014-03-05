@@ -464,10 +464,8 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                              * @returns {string}
                              */
                             scope.rangeTranslation = function(low, high) {
-                                low = parseFloat(low).toFixed(scope.precision);
-                                high = parseFloat(high).toFixed(scope.precision);
                                 if(angular.isUndefined(attributes.translateRange)) {
-                                    return "Range: " + scope.translation({value: parseFloat((high - low).toFixed(scope.precision))});
+                                    return "Range: " + scope.translation(high - low);
                                 }
                                 return scope.translateRange({low: low, high: high});
                             };
@@ -479,8 +477,6 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                              * @returns {string}
                              */
                             scope.combinedTranslation = function(low, high) {
-                                low = parseFloat(low).toFixed(scope.precision);
-                                high = parseFloat(high).toFixed(scope.precision);
                                 if(angular.isUndefined(attributes.translateCombined)) {
                                     return scope.translation(low) + " - " + scope.translation(high);
                                 }
