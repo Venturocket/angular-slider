@@ -37,6 +37,13 @@ And add `vr.directives.slider` as a dependency for your app:
 angular.module('myApp', ['vr.directives.slider', ...]);
 ```
 
+**NOTE:** in IE10/11 an annoying tooltip will show up unless you add the following css:
+```css
+::-ms-tooltip {
+	display: none;
+}
+```
+
 ### Single Knob
 #### Markup
 As an element:
