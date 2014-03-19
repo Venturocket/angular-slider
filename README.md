@@ -15,17 +15,28 @@ License: MIT
 - Doesn't work in IE8-
 
 ## Installation
+
 ```
 bower install venturocket-angular-slider
 ```
 
 ## Usage
 ### Requirements
+
+Add `<script>` to your `html` files for angular, [angular-touch](https://github.com/angular/bower-angular-touch) and angular-slider:
+
 ```html
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular-touch.min.js"></script>
 <script src="build/angular-slider.min.js"></script>
 ```
+
+And add `vr.directives.slider` as a dependency for your app:
+
+```javascript
+angular.module('myApp', ['vr.directives.slider', ...]);
+```
+
 ### Single Knob
 #### Markup
 As an element:
