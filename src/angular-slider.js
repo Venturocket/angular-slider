@@ -885,7 +885,6 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                      * @type {number}
                                      */
                                     var rawLowPercent = percentFromDecodedValue(scope.decodedValues[refLow]);
-									console.log(scope.decodedValues[refLow]+"..."+rawLowPercent);
 
                                     /**
                                      * The width in percent of a step above the low value
