@@ -28,23 +28,59 @@
         </ul>
       </header>
       <section>
-        <h2>
+        <h1>
+<a name="angular-slider-" class="anchor" href="#angular-slider-"><span class="octicon octicon-link"></span></a>angular-slider <a href="http://travis-ci.org/Venturocket/angular-slider"><img src="https://secure.travis-ci.org/Venturocket/angular-slider.png?branch=master" alt="Build Status"></a>
+</h1>
+
+<p>Slider directive for AngularJS. <a href="https://venturocket.github.io/angular-slider">https://venturocket.github.io/angular-slider</a><br>
+License: MIT</p>
+
+<h2>
 <a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h2>
 
 <ul>
 <li>Single or dual knob</li>
 <li>Fully Stylable</li>
+<li>Custom arbitrary scaling</li>
 <li>Adjustable knob "Stickiness"</li>
 <li>Adjustable minimum range width</li>
-<li>Draggable range</li>
-<li>Touch and IE10/Win8 pointer event support</li>
+<li>Draggable selection range</li>
+<li>Full touch event support</li>
 </ul><h2>
 <a name="known-issues" class="anchor" href="#known-issues"><span class="octicon octicon-link"></span></a>Known Issues</h2>
 
 <ul>
-<li>Doesn't work in IE&lt;9</li>
+<li>When hidden during initialization (<code>display: none;</code>) the slider might not display correctly when shown. Issue <code>$scope.$broadcast('refreshSlider');</code> in a parent scope to tell the slider to update the DOM. </li>
 </ul><h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<pre><code>bower install venturocket-angular-slider
+</code></pre>
+
+<h2>
 <a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<h3>
+<a name="requirements" class="anchor" href="#requirements"><span class="octicon octicon-link"></span></a>Requirements</h3>
+
+<p>Add <code>&lt;script&gt;</code>s to your <code>html</code> files for <a href="https://github.com/angular/bower-angular">angular</a>, <a href="https://github.com/angular/bower-angular-touch">angular-touch</a> and angular-slider:</p>
+
+<div class="highlight highlight-html"><pre><span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"https://ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular.min.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+<span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"https://ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular-touch.min.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+<span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"build/angular-slider.min.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+</pre></div>
+
+<p>And add <code>vr.directives.slider</code> as a dependency for your app:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">'myApp'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'vr.directives.slider'</span><span class="p">,</span> <span class="p">...]);</span>
+</pre></div>
+
+<p><strong>NOTE:</strong> in IE10/11 an annoying tooltip will show up unless you add the following css:</p>
+
+<div class="highlight highlight-css"><pre><span class="o">:</span><span class="nd">:-ms-tooltip</span> <span class="p">{</span>
+    <span class="k">display</span><span class="o">:</span> <span class="k">none</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
 
 <h3>
 <a name="single-knob" class="anchor" href="#single-knob"><span class="octicon octicon-link"></span></a>Single Knob</h3>
@@ -54,30 +90,34 @@
 
 <p>As an element:</p>
 
-<pre><code>&lt;slider
-    ng-model="{string}"
-    floor="{float}"
-    ceiling="{float}"
-    step="{float}"
-    precision="{integer}"
-    stretch="{integer}"
-    translate="{string}"&gt;
-&lt;/slider&gt;
-</code></pre>
+<div class="highlight highlight-html"><pre><span class="nt">&lt;slider</span>
+    <span class="na">ng-model=</span><span class="s">"{expression}"</span>
+    <span class="na">floor=</span><span class="s">"{float}"</span>
+    <span class="na">ceiling=</span><span class="s">"{float}"</span>
+    <span class="na">step=</span><span class="s">"{float}"</span>
+    <span class="na">precision=</span><span class="s">"{integer}"</span>
+    <span class="na">stretch=</span><span class="s">"{integer}"</span>
+    <span class="na">translate-fn=</span><span class="s">"{expression}"</span>
+    <span class="na">scale-fn=</span><span class="s">"{expression}"</span>
+    <span class="na">inverse-scale-fn=</span><span class="s">"{expression}"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/slider&gt;</span>
+</pre></div>
 
 <p>As an attribute:</p>
 
-<pre><code>&lt;div
-    slider
-    ng-model="{string}"
-    floor="{float}"
-    ceiling="{float}"
-    step="{float}"
-    precision="{integer}"
-    stretch="{integer}"
-    translate="{string}"&gt;
-&lt;/div&gt;
-</code></pre>
+<div class="highlight highlight-html"><pre><span class="nt">&lt;div</span>
+    <span class="na">slider</span>
+    <span class="na">ng-model=</span><span class="s">"{expression}"</span>
+    <span class="na">floor=</span><span class="s">"{float}"</span>
+    <span class="na">ceiling=</span><span class="s">"{float}"</span>
+    <span class="na">step=</span><span class="s">"{float}"</span>
+    <span class="na">precision=</span><span class="s">"{integer}"</span>
+    <span class="na">stretch=</span><span class="s">"{integer}"</span>
+    <span class="na">translate-fn=</span><span class="s">"{expression}"</span>
+    <span class="na">scale-fn=</span><span class="s">"{expression}"</span>
+    <span class="na">inverse-scale-fn=</span><span class="s">"{expression}"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+</pre></div>
 
 <h4>
 <a name="parameters" class="anchor" href="#parameters"><span class="octicon octicon-link"></span></a>Parameters</h4>
@@ -86,43 +126,73 @@
 <thead><tr>
 <th>Param</th>
 <th>Type</th>
+<th>Required</th>
+<th>Default</th>
 <th>Details</th>
 </tr></thead>
 <tbody>
 <tr>
 <td>ng-model</td>
-<td>string</td>
+<td>expression</td>
+<td>Yes</td>
+<td>none</td>
 <td>Assignable angular expression to which to data-bind the value.</td>
 </tr>
 <tr>
 <td>floor</td>
 <td>float</td>
+<td>Yes</td>
+<td>none</td>
 <td>The lowest value possible</td>
 </tr>
 <tr>
 <td>ceiling</td>
 <td>float</td>
+<td>Yes</td>
+<td>none</td>
 <td>The highest value possible</td>
 </tr>
 <tr>
 <td>step</td>
-<td>float (optional)</td>
-<td>The width between each tick. Default: infinite</td>
+<td>float</td>
+<td>No</td>
+<td>inf</td>
+<td>The width between each tick.</td>
 </tr>
 <tr>
 <td>precision</td>
-<td>integer (optional)</td>
-<td>The numerical precision to which to round the value. Default: 0</td>
+<td>integer</td>
+<td>No</td>
+<td>0</td>
+<td>The numerical precision to which to round the value.</td>
 </tr>
 <tr>
 <td>stretch</td>
-<td>integer (optional)</td>
-<td>How stretch resistant the knobs will act. The higher the stretch resistance the more "snappy" the knobs will feel. Default: 3</td>
+<td>integer</td>
+<td>No</td>
+<td>3</td>
+<td>How sticky the knobs will act. 1 = no stickiness</td>
 </tr>
 <tr>
-<td>translate</td>
-<td>string (optional)</td>
+<td>translate-fn</td>
+<td>expression</td>
+<td>No</td>
+<td>none</td>
 <td>A translation function to apply to all view values. Be sure to omit the parentheses (e.g. "transFunc" instead of "transFunc()")</td>
+</tr>
+<tr>
+<td>scale-fn</td>
+<td>expression</td>
+<td>No</td>
+<td>none</td>
+<td>A scaling function to apply to the value. See the <code>Scaling</code> section below for more details. Be sure to omit the parentheses (e.g. "scaleFunc" instead of "scaleFunc()")</td>
+</tr>
+<tr>
+<td>inverse-scale-fn</td>
+<td>expression</td>
+<td>No</td>
+<td>none</td>
+<td>The inverse of the scaling function. This is required if a scaling function is specified. See the <code>Scaling</code> section below for more details. Be sure to omit the parentheses (e.g. "scaleFunc" instead of "scaleFunc()")</td>
 </tr>
 </tbody>
 </table><h2></h2>
@@ -135,33 +205,42 @@
 
 <p>As an element:</p>
 
-<pre><code>&lt;slider
-    ng-model-low="{string}"
-    ng-model-high="{string}"
-    floor="{float}"
-    ceiling="{float}"
-    step="{float}"
-    precision="{integer}"
-    stretch="{integer}"
-    translate="{string}"&gt;
-&lt;/slider&gt;
-</code></pre>
+<div class="highlight highlight-html"><pre><span class="nt">&lt;slider</span>
+    <span class="na">ng-model=</span><span class="s">"{expression}"</span>
+    <span class="na">ng-model-range=</span><span class="s">"{expression}"</span>
+    <span class="na">floor=</span><span class="s">"{float}"</span>
+    <span class="na">ceiling=</span><span class="s">"{float}"</span>
+    <span class="na">buffer=</span><span class="s">"{float}"</span>
+    <span class="na">step=</span><span class="s">"{float}"</span>
+    <span class="na">precision=</span><span class="s">"{integer}"</span>
+    <span class="na">stretch=</span><span class="s">"{integer}"</span>
+    <span class="na">translate-fn=</span><span class="s">"{expression}"</span>
+    <span class="na">translate-range-fn=</span><span class="s">"{expression}"</span>
+    <span class="na">translate-combined-fn=</span><span class="s">"{expression}"</span>
+    <span class="na">scale-fn=</span><span class="s">"{expression}"</span>
+    <span class="na">inverse-scale-fn=</span><span class="s">"{expression}"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/slider&gt;</span>
+</pre></div>
 
 <p>As an attribute:</p>
 
-<pre><code>&lt;div
-    slider
-    ng-model-low="{string}"
-    ng-model-high="{string}"
-    floor="{float}"
-    ceiling="{float}"
-    step="{float}"
-    buffer="{float}"
-    precision="{integer}"
-    stretch="{integer}"
-    translate="{string}"&gt;
-&lt;/div&gt;
-</code></pre>
+<div class="highlight highlight-html"><pre><span class="nt">&lt;div</span>
+    <span class="na">slider</span>
+    <span class="na">ng-model=</span><span class="s">"{expression}"</span>
+    <span class="na">ng-model-range=</span><span class="s">"{expression}"</span>
+    <span class="na">floor=</span><span class="s">"{float}"</span>
+    <span class="na">ceiling=</span><span class="s">"{float}"</span>
+    <span class="na">buffer=</span><span class="s">"{float}"</span>
+    <span class="na">step=</span><span class="s">"{float}"</span>
+    <span class="na">precision=</span><span class="s">"{integer}"</span>
+    <span class="na">stretch=</span><span class="s">"{integer}"</span>
+    <span class="na">translate-fn=</span><span class="s">"{expression}"</span>
+    <span class="na">translate-range-fn=</span><span class="s">"{expression}"</span>
+    <span class="na">translate-combined-fn=</span><span class="s">"{expression}"</span>
+    <span class="na">scale-fn=</span><span class="s">"{expression}"</span>
+    <span class="na">inverse-scale-fn=</span><span class="s">"{expression}"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+</pre></div>
 
 <h4>
 <a name="parameters-1" class="anchor" href="#parameters-1"><span class="octicon octicon-link"></span></a>Parameters</h4>
@@ -170,56 +249,135 @@
 <thead><tr>
 <th>Param</th>
 <th>Type</th>
+<th>Required</th>
+<th>Default</th>
 <th>Details</th>
 </tr></thead>
 <tbody>
 <tr>
-<td>ng-model-low</td>
-<td>string</td>
+<td>ng-model</td>
+<td>expression</td>
+<td>Yes</td>
+<td>none</td>
 <td>Assignable angular expression to which to data-bind the low value.</td>
 </tr>
 <tr>
-<td>ng-model-high</td>
-<td>string</td>
+<td>ng-model-range</td>
+<td>expression</td>
+<td>Yes</td>
+<td>none</td>
 <td>Assignable angular expression to which to data-bind the high value.</td>
 </tr>
 <tr>
 <td>floor</td>
 <td>float</td>
+<td>Yes</td>
+<td>none</td>
 <td>The lowest value possible</td>
 </tr>
 <tr>
 <td>ceiling</td>
 <td>float</td>
+<td>Yes</td>
+<td>none</td>
 <td>The highest value possible</td>
 </tr>
 <tr>
-<td>step</td>
-<td>float (optional)</td>
-<td>The width between each tick. Default: infinite</td>
+<td>buffer</td>
+<td>float</td>
+<td>No</td>
+<td>0</td>
+<td>The minimum difference between the low and high values</td>
 </tr>
 <tr>
-<td>buffer</td>
-<td>float (optional)</td>
-<td>The minimum difference between the low and high values. Default: 0</td>
+<td>step</td>
+<td>float</td>
+<td>No</td>
+<td>inf</td>
+<td>The width between each tick.</td>
 </tr>
 <tr>
 <td>precision</td>
-<td>integer (optional)</td>
-<td>The numerical precision to which to round the value. Default: 0</td>
+<td>integer</td>
+<td>No</td>
+<td>0</td>
+<td>The numerical precision to which to round the value.</td>
 </tr>
 <tr>
 <td>stretch</td>
-<td>integer (optional)</td>
-<td>How stretch resistant the knobs will act. The higher the stretch resistance the more "snappy" the knobs will feel. Default: 3</td>
+<td>float</td>
+<td>No</td>
+<td>3</td>
+<td>How sticky the knobs will act. 1 = no stickiness</td>
 </tr>
 <tr>
-<td>translate</td>
-<td>string (optional)</td>
-<td>A translation function to apply to all view values. Be sure to omit the parentheses (e.g. "transFunc" instead of "transFunc()")</td>
+<td>translate-fn</td>
+<td>expression</td>
+<td>No</td>
+<td>none</td>
+<td>A translation function to apply to most of the view values. Be sure to omit the parentheses (e.g. "transFunc" instead of "transFunc()")</td>
+</tr>
+<tr>
+<td>translate-range-fn</td>
+<td>expression</td>
+<td>No</td>
+<td>none</td>
+<td>A translation function to apply to the range value. Be sure to omit the parentheses (e.g. "transFunc" instead of "transFunc()")</td>
+</tr>
+<tr>
+<td>translate-combined-fn</td>
+<td>expression</td>
+<td>No</td>
+<td>none</td>
+<td>A translation function to apply to the combined value (when the knobs are too close together). Be sure to omit the parentheses (e.g. "transFunc" instead of "transFunc()")</td>
+</tr>
+<tr>
+<td>scale-fn</td>
+<td>expression</td>
+<td>No</td>
+<td>none</td>
+<td>A scaling function to apply to the value. See the <code>Scaling</code> section below for more details. Be sure to omit the parentheses (e.g. "scaleFunc" instead of "scaleFunc()")</td>
+</tr>
+<tr>
+<td>inverse-scale-fn</td>
+<td>expression</td>
+<td>No</td>
+<td>none</td>
+<td>The inverse of the scaling function. This is required if a scaling function is specified. See the <code>Scaling</code> section below for more details. Be sure to omit the parentheses (e.g. "scaleFunc" instead of "scaleFunc()")</td>
 </tr>
 </tbody>
-</table>
+</table><h2>
+<a name="scaling" class="anchor" href="#scaling"><span class="octicon octicon-link"></span></a>Scaling</h2>
+
+<p>You can supply any arbitrary scaling function (and its inverse) to the slider to suit your needs. 
+The inverse scaling function MUST be specified if a scaling function is specified (and vice versa).
+The scaling/inverse function can be pretty much anything as long as they take a number as a parameter and return a number. Like this:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="kd">function</span> <span class="nx">scaleFn</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="nx">value</span><span class="p">,</span><span class="mi">3</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="kd">function</span> <span class="nx">inverseScaleFn</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">sign</span> <span class="o">=</span> <span class="p">(</span><span class="nx">value</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="o">?</span> <span class="mi">1</span> <span class="o">:</span> <span class="p">(</span><span class="nx">value</span><span class="o">/</span><span class="nb">Math</span><span class="p">.</span><span class="nx">abs</span><span class="p">(</span><span class="nx">value</span><span class="p">));</span>
+    <span class="k">return</span> <span class="nx">sign</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">abs</span><span class="p">(</span><span class="nx">value</span><span class="p">),</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>A few notes:</p>
+
+<ul>
+<li>scaleFn(inverseScaleFn(x)) MUST produce x or you're gonna have a bad time</li>
+<li>If your scale function returns the same y for multiple x's within the range of the slider you're gonna have a bad time</li>
+<li>If the floor of your slider dips into negative numbers and you don't account for possible imaginary numbers you're gonna have a bad time</li>
+</ul><h2>
+<a name="additional-features" class="anchor" href="#additional-features"><span class="octicon octicon-link"></span></a>Additional Features</h2>
+
+<ul>
+<li>
+<code>ngChange</code> support (<a href="http://docs.angularjs.org/api/ng/directive/ngChange">docs</a>)</li>
+<li>
+<code>ngDisabled</code> support (<a href="http://docs.angularjs.org/api/ng/directive/ngDisabled">docs</a>)</li>
+<li>implements <code>ngModelController</code> for form validation and dirty/pristine states (<a href="http://docs.angularjs.org/api/ng/type/ngModel.NgModelController">docs</a>)</li>
+</ul>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/Venturocket">Venturocket</a></p>
