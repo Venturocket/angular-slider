@@ -25,6 +25,6 @@
 		"angular-scenario": "*"
     },
 	"resolutions": {
-		"angular": "v1.2.14"
+		"angular": "v1.2.16"
 	}
 }
