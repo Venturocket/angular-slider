@@ -1,7 +1,7 @@
 {
     "name": "angular-slider",
-    "version": "0.3.0",
-    "main": "./build/angular-slider.min.js",
+    "version": "0.3.1",
+    "main": "./build/angular-slider.js",
     "ignore": [
         "**/.*",
         "node_modules",
@@ -13,7 +13,8 @@
 		".editorconfig",
 		".jshintrc",
 		".travis.yml",
-		"*.js",
+		"Gruntfile.js",
+		"karma.conf.js",
 		"*.html"
     ],
     "dependencies": {
