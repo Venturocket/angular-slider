@@ -21,7 +21,7 @@ describe("Unit: Slider Directive", function() {
 			AngularSlider = { inputtypes: { range: false } };
 		});
 		
-		describe('non-range data', function() {
+		describe('with non-range data', function() {
 
 			beforeEach(function() {
 				$rootScope.skill = {
@@ -31,7 +31,7 @@ describe("Unit: Slider Directive", function() {
 					}
 				};
 				spyOn($rootScope.skill,'translate').andCallThrough();
-				element = $compile("<slider floor='1' ceiling='3' step='0.25' precision='2' translate='skill.translate' ng-model='skill.value'></slider>")($rootScope);
+				element = $compile("<slider floor='1' ceiling='3' step='0.25' precision='2' translate-fn='skill.translate' ng-model='skill.value'></slider>")($rootScope);
 				$rootScope.$digest();
 				$(element).find('span').css({'display':'block','position':'absolute'});
 				$(element).find('.bar').width(500);
@@ -114,7 +114,7 @@ describe("Unit: Slider Directive", function() {
 			});
 
 		});
-		describe('range data', function() {
+		describe('with range data', function() {
 
 			beforeEach(function() {
 				AngularSlider = { inputtypes: { range: false } };
@@ -122,7 +122,7 @@ describe("Unit: Slider Directive", function() {
 					low: 2,
                     high: 2.5
 				};
-				element = $compile("<slider floor='1' ceiling='3' step='0.25' buffer='0.5' precision='3' ng-model-low='skill.low' ng-model-high='skill.high'></slider>")($rootScope);
+				element = $compile("<slider floor='1' ceiling='3' step='0.25' buffer='0.5' precision='3' ng-model='skill.low' ng-model-range='skill.high'></slider>")($rootScope);
 				$rootScope.$digest();
 				$(element).find('span').css({'display':'block','position':'absolute'});
 				$(element).find('.bar.full').width(500);
@@ -298,7 +298,7 @@ describe("Unit: Slider Directive", function() {
 				$(element).find('.bar.unselected.low').trigger($.Event('mousedown',{ clientX: 62 }));
 	
 				expect($rootScope.skill.low).toBe(1.25);
-				expect(element.find('.pointer.low').css('left')).toBe('62.5px');
+				expect(parseFloat(element.find('.pointer.low').css('left'))).toBeCloseTo(62.5);
 				expect(element.find('.bubble.low').text()).toBe('1.250');
 	
 			});
@@ -333,7 +333,7 @@ describe("Unit: Slider Directive", function() {
 					}
 				};
 				spyOn($rootScope.skill,'translate').andCallThrough();
-				element = $compile("<slider floor='1' ceiling='3' step='0.25' precision='2' translate='skill.translate' ng-model='skill.value'></slider>")($rootScope);
+				element = $compile("<slider floor='1' ceiling='3' step='0.25' precision='2' translate-fn='skill.translate' ng-model='skill.value'></slider>")($rootScope);
 				$rootScope.$digest();
 				$(element).find('span').css({'display':'block','position':'absolute'});
 				$(element).find('.bar').width(500);
@@ -425,7 +425,7 @@ describe("Unit: Slider Directive", function() {
 					low: 2,
                     high: 2.5
 				};
-				element = $compile("<slider floor='1' ceiling='3' step='0.25' buffer='0.5' precision='3' ng-model-low='skill.low' ng-model-high='skill.high'></slider>")($rootScope);
+				element = $compile("<slider floor='1' ceiling='3' step='0.25' buffer='0.5' precision='3' ng-model='skill.low' ng-model-range='skill.high'></slider>")($rootScope);
 				$rootScope.$digest();
 				$(element).find('span').css({'display':'block','position':'absolute'});
 				$(element).find('.bar.full').width(500);
@@ -607,7 +607,7 @@ describe("Unit: Slider Directive", function() {
 				$(element).find('.input.low').trigger($.Event('mousedown',{ clientX: 62 }));
 	
 				expect($rootScope.skill.low).toBe(1.25);
-				expect(element.find('.pointer.low').css('left')).toBe('62.5px');
+				expect(parseFloat(element.find('.pointer.low').css('left'))).toBeCloseTo(62.5);
 				expect(element.find('.bubble.low').text()).toBe('1.250');
 	
 			});
@@ -648,7 +648,7 @@ describe("Unit: Slider Directive", function() {
         describe("and non-range data", function() {
         
             beforeEach(function() {
-                element = $compile("<slider floor='1' ceiling='9' precision='2' scale='skill.sq' inverse-scale='skill.sqRt' ng-model='skill.value'></slider>")($rootScope);
+                element = $compile("<slider floor='1' ceiling='9' precision='2' scale-fn='skill.sq' inverse-scale-fn='skill.sqRt' ng-model='skill.value'></slider>")($rootScope);
                 $rootScope.$digest();
                 $(element).find('span').css({'display':'block','position':'absolute'});
                 $(element).find('.bar.full').width(400);
@@ -671,7 +671,7 @@ describe("Unit: Slider Directive", function() {
         describe("and range data", function() {
         
             beforeEach(function() {
-                element = $compile("<slider floor='1' ceiling='25' precision='2' scale='skill.sq' inverse-scale='skill.sqRt' ng-model-low='skill.values.low' ng-model-high='skill.values.high'></slider>")($rootScope);
+                element = $compile("<slider floor='1' ceiling='25' precision='2' scale-fn='skill.sq' inverse-scale-fn='skill.sqRt' ng-model='skill.values.low' ng-model-range='skill.values.high'></slider>")($rootScope);
                 $rootScope.$digest();
                 $(element).find('span').css({'display':'block','position':'absolute'});
                 $(element).find('.bar.full').width(400);
@@ -765,5 +765,154 @@ describe("Unit: Slider Directive", function() {
             expect($(element).find('.bubble.low').text()).toBe('2.00');
         });
     });
+	
+	describe("with non-range data", function() {
+        
+        beforeEach(function() {
+			AngularSlider = { inputtypes: { range: true } };
+            $rootScope.skill = 1.5;
+			$rootScope.change = function() {};
+            element = $compile("<slider floor='1' ceiling='3' precision='2' step='0.5' ng-model='skill' ng-change='change()'></slider>")($rootScope);
+            $rootScope.$digest();
+            $(element).find('span').css({'display':'block','position':'absolute'});
+            $(element).find('.bar.full').width(400);
+            $rootScope.$apply(function() { $rootScope.skill = 2; });
+        });
+		
+		it('should be pristine', function() {
+			expect(element).toHaveClass('ng-pristine');
+		});
+		
+		it('should be dirty after moving the knob', function() {
+			
+            var input = $(element).find(".input.low");
+            
+            input.trigger($.Event('mousedown',{ clientX: 200 }));
+            input.trigger($.Event('mousemove',{ clientX: 245 }));
+			
+			expect(element).toHaveClass('ng-dirty');
+		});
+		
+		it('should fire the change event', function() {
+			spyOn($rootScope, 'change');
+            var input = $(element).find(".input.low");
+            
+            input.trigger($.Event('mousedown',{ clientX: 200 }));
+            input.trigger($.Event('mousemove',{ clientX: 245 }));
+			
+			expect($rootScope.change).toHaveBeenCalled();
+		});
+		
+	});
+	
+	describe("with range data", function() {
+        
+        beforeEach(function() {
+			AngularSlider = { inputtypes: { range: true } };
+            $rootScope.skill = { low: 1.5, high: 2 };
+			$rootScope.change = function(skill) {};
+            element = $compile("<slider floor='1' ceiling='3' precision='2' step='0.5' ng-model='skill.low' ng-model-range='skill.high' ng-change='change(skill)'></slider>")($rootScope);
+            $rootScope.$digest();
+            $(element).find('span').css({'display':'block','position':'absolute'});
+            $(element).find('.bar.full').width(400);
+            $rootScope.$apply(function() { $rootScope.skill.low = 1; });
+        });
+		
+		it('should be pristine', function() {
+			expect(element).toHaveClass('ng-pristine');
+		});
+		
+		it('should be dirty after moving the knob', function() {
+			
+            var input = $(element).find(".input.high");
+            
+            input.trigger($.Event('mousedown',{ clientX: 200 }));
+            input.trigger($.Event('mousemove',{ clientX: 245 }));
+			
+			expect(element).toHaveClass('ng-dirty');
+		});
+		
+		it('should fire the change event', function() {
+			spyOn($rootScope, 'change');
+            var input = $(element).find(".input.high");
+            
+            input.trigger($.Event('mousedown',{ clientX: 200 }));
+            input.trigger($.Event('mousemove',{ clientX: 245 }));
+			
+			expect($rootScope.change).toHaveBeenCalledWith({ low: 1, high: 2 });
+		});
+	});
+	
+	describe("with non-range data", function() {
+        
+        beforeEach(function() {
+			AngularSlider = { inputtypes: { range: true } };
+            $rootScope.skill = 1.5;
+			$rootScope.disabled = false;
+            element = $compile("<slider floor='1' ceiling='3' precision='2' ng-model='skill' ng-disabled='disabled'></slider>")($rootScope);
+            $rootScope.$digest();
+            $(element).find('span').css({'display':'block','position':'absolute'});
+            $(element).find('.bar.full').width(400);
+            $rootScope.$apply(function() { $rootScope.skill = 2; });
+        });
+		
+		it('should move when disabled is false', function() {
+			
+            var input = $(element).find(".input.low");
+            
+            input.trigger($.Event('mousedown',{ clientX: 200 }));
+            input.trigger($.Event('mousemove',{ clientX: 300 }));
+			
+			expect($rootScope.skill).toBeCloseTo(2.5);
+		});
+		
+		it('should not move when disabled is true', function() {
+			$rootScope.disabled = true;
+			$rootScope.$digest();
+            var input = $(element).find(".input.low");
+            
+            input.trigger($.Event('mousedown',{ clientX: 200 }));
+            input.trigger($.Event('mousemove',{ clientX: 300 }));
+			
+			expect($rootScope.skill).toBe(2);
+		});
+		
+	});
+	
+	describe("with range data", function() {
+        
+        beforeEach(function() {
+			AngularSlider = { inputtypes: { range: true } };
+            $rootScope.skill = { low: 1.5, high: 2 };
+			$rootScope.disabled = false;
+            element = $compile("<slider floor='1' ceiling='3' precision='2' ng-model='skill.low' ng-model-range='skill.high' ng-disabled='disabled'></slider>")($rootScope);
+            $rootScope.$digest();
+            $(element).find('span').css({'display':'block','position':'absolute'});
+            $(element).find('.bar.full').width(400);
+            $rootScope.$apply(function() { $rootScope.skill.low = 1; });
+        });
+		
+		it('should move when disabled is false', function() {
+			
+            var input = $(element).find(".input.high");
+            
+            input.trigger($.Event('mousedown',{ clientX: 200 }));
+            input.trigger($.Event('mousemove',{ clientX: 300 }));
+			
+			expect($rootScope.skill.high).toBeCloseTo(2.5);
+		});
+		
+		it('should not move when disabled is true', function() {
+			$rootScope.disabled = true;
+			$rootScope.$digest();
+            var input = $(element).find(".input.high");
+            
+            input.trigger($.Event('mousedown',{ clientX: 200 }));
+            input.trigger($.Event('mousemove',{ clientX: 300 }));
+			
+			expect($rootScope.skill.high).toBe(2);
+		});
+		
+	});
 
 });

@@ -1,6 +1,6 @@
 {
     "name": "angular-slider",
-    "version": "0.2.5",
+    "version": "0.3.0",
     "main": "./build/angular-slider.min.js",
     "ignore": [
         "**/.*",
@@ -8,11 +8,17 @@
         "components",
         "lib",
         "src",
-        "test"
+        "test",
+		".g*",
+		".editorconfig",
+		".jshintrc",
+		".travis.yml",
+		"*.js",
+		"*.html"
     ],
     "dependencies": {
-        "angular": "~1.2.14",
-		"angular-touch": "~1.2.14"
+        "angular": "~1.2.*",
+		"angular-touch": "~1.2.*"
     },
     "devDependencies": {
         "angular-mocks": "*",

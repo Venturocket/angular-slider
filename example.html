@@ -104,17 +104,17 @@
 		Value: <input ng-model="value" type="text" />
 		<h3>Dual Knob</h3>
 	    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' buffer='{{ buffer }}'
-	            stickiness='{{ stickiness }}' ng-model-low='values.low' ng-model-high='values.high' translate='translate'
-	            translate-range='translateRange' translate-combined='translateCombined' style="width: {{ sliderWidth }};"></slider>
+	            stickiness='{{ stickiness }}' ng-model='values.low' ng-model-range='values.high' translate-fn='translate'
+	            translate-range-fn='translateRange' translate-combined-fn='translateCombined' style="width: {{ sliderWidth }};"></slider>
 		Values: <input ng-model="values.low" type="text" /><input ng-model="values.high" type="text" />
 		<h2>w/ Scaling functions (y=x^3)</h2>
 		<h3>Single Knob</h3>
 	    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' stickiness='{{ stickiness }}'
-	            ng-model='value' scale='scale' inverse-scale='inverseScale' style="width: {{ sliderWidth }};"></slider>
+	            ng-model='value' scale-fn='scale' inverse-scale-fn='inverseScale' style="width: {{ sliderWidth }};"></slider>
 		<h3>Dual Knob</h3>
 	    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' buffer='{{ buffer }}'
-	            stickiness='{{ stickiness }}' ng-model-low='values.low' ng-model-high='values.high' scale='scale' inverse-scale='inverseScale'
-	            translate='translate' style="width: {{ sliderWidth }};"></slider>
+	            stickiness='{{ stickiness }}' ng-model='values.low' ng-model-range='values.high' scale-fn='scale' inverse-scale-fn='inverseScale'
+	            translate-fn='translate' style="width: {{ sliderWidth }};"></slider>
 		<h2>in ngRepeat</h2>
 		<div ng-repeat="scope in scopes">
 		    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' stickiness='{{ stickiness }}'
