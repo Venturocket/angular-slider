@@ -50,7 +50,11 @@ License: MIT</p>
 <a name="known-issues" class="anchor" href="#known-issues"><span class="octicon octicon-link"></span></a>Known Issues</h2>
 
 <ul>
-<li>When hidden during initialization (<code>display: none;</code>) the slider might not display correctly when shown. Issue <code>$scope.$broadcast('refreshSlider');</code> in a parent scope to tell the slider to update the DOM. </li>
+<li>When hidden during initialization (<code>display: none;</code>) the slider might not display correctly when shown. Issue <code>$scope.$broadcast('refreshSlider');</code> 
+in a parent scope to tell the slider to update the DOM. </li>
+<li>The <code>step</code> attribute conflicts with angular-foundation's <code>step</code> directive (<a href="http://madmimi.github.io/angular-foundation/#/tour">docs</a>). To remedy this, 
+use <code>step-width</code> instead (it's an alias of <code>step</code>). <code>step</code> will be deprecated in the next minor release, so if you want to do a bit of future proofing 
+you can start using <code>step-width</code> now and save yourself a bit of migration work later .</li>
 </ul><h2>
 <a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
 
