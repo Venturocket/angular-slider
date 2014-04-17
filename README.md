@@ -12,7 +12,11 @@ License: MIT
 - Full touch event support
 
 ## Known Issues
-- When hidden during initialization (`display: none;`) the slider might not display correctly when shown. Issue `$scope.$broadcast('refreshSlider');` in a parent scope to tell the slider to update the DOM. 
+- When hidden during initialization (`display: none;`) the slider might not display correctly when shown. Issue `$scope.$broadcast('refreshSlider');` 
+in a parent scope to tell the slider to update the DOM. 
+- The `step` attribute conflicts with angular-foundation's `step` directive ([docs](http://madmimi.github.io/angular-foundation/#/tour)). To remedy this, 
+use `step-width` instead (it's an alias of `step`). `step` will be deprecated in the next minor release, so if you want to do a bit of future proofing 
+you can start using `step-width` now and save yourself a bit of migration work later .
 
 ## Installation
 

@@ -914,5 +914,30 @@ describe("Unit: Slider Directive", function() {
 		});
 		
 	});
+	
+	describe("with 'step-width' attribute", function() {
+        
+        beforeEach(function() {
+			AngularSlider = { inputtypes: { range: true } };
+            $rootScope.skill = 1.5;
+			$rootScope.disabled = false;
+            element = $compile("<slider floor='1' ceiling='3' precision='2' step-width='0.25' show-steps='true' ng-model='skill'></slider>")($rootScope);
+            $rootScope.$digest();
+            $(element).find('span').css({'display':'block','position':'absolute'});
+            $(element).find('.bar.full').width(400);
+            $rootScope.$apply(function() { $rootScope.skill = 2; });
+        });
+		
+		it('should respect the step width', function() {
+			
+            var input = $(element).find(".input.low");
+            
+            input.trigger($.Event('mousedown',{ clientX: 200 }));
+            input.trigger($.Event('mousemove',{ clientX: 320 }));
+			
+			expect($rootScope.skill).toBe(2.5);
+		});
+		
+	});
 
 });
