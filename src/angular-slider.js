@@ -1395,6 +1395,8 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                 function onStart(event, ptr, rf) {
 									
 									if(scope.ngDisabled && scope.ngDisabled == true) return;
+									
+									event.preventDefault();
 
 									/**
 									 * The current x position of the mouse/finger/etc.
@@ -1447,17 +1449,19 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
 
                                             /**
                                              * Start event
+                                             * @param {object} coords
                                              * @param {event} ev
                                              */
-                                            function start(ev) {
+                                            function start(coords, ev) {
                                                 onStart(ev, ptr, rf);
                                             }
 
                                             /**
                                              * End event
+                                             * @param {object} coords
                                              * @param {event} ev
                                              */
-                                            function end(ev) {
+                                            function end(coords, ev) {
                                                 onMove(ev);
                                                 onEnd();
                                             }
@@ -1465,9 +1469,13 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                             // bind events to the range input
 											$swipe.bind(elem, {
 												start : start,
-												move  : onMove,
+												move  : function(coords, ev) {
+													onMove(ev);
+												},
 												end   : end,
-												cancel: onEnd
+												cancel: function(coords, ev) {
+													onEnd(ev);
+												}
 											});
                                         }
 
@@ -1503,7 +1511,7 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
 
                                             // bind the swipe start event to the element
                                             $swipe.bind(elem, {
-                                                start: function(ev) {
+                                                start: function(coords, ev) {
                                                     onStart(ev, ptr, rf);
                                                 }
                                             });
@@ -1520,12 +1528,16 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
 
                                             // bind the swipe move, end, and cancel events
                                             $swipe.bind(elem, {
-                                                move  : onMove,
-                                                end   : function(ev) {
+                                                move  : function(coords, ev) {
+                                                	onMove(ev);
+                                                },
+                                                end   : function(coords, ev) {
                                                     onMove(ev);
                                                     onEnd();
                                                 },
-                                                cancel: onEnd
+                                                cancel: function(coords, ev) {
+                                                	onEnd(ev);
+                                                }
                                             });
                                         }
 
