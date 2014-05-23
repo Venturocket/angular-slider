@@ -1,4 +1,6 @@
 module.exports = function(grunt){
+    'use strict';
+
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -20,14 +22,32 @@ module.exports = function(grunt){
                 src: ['<%= srcFiles %>'],
                 dest: 'build/<%= pkg.name %>.min.js'
             }
+        },
+        jshint: {
+            options: {
+                jshintrc: true,
+                reporter: require('jshint-stylish')
+            },
+            all: {
+                src: [
+                    'Gruntfile.js',
+                    'karma.conf.js',
+                    'src/**/*.js',
+                    'test/**/*.js'
+                ],
+                options: {
+                    force: true
+                }
+            }
         }
     });
 
     // Load the plugin that provides the "uglify" task.
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-jshint');
 
     // Default task(s).
-    grunt.registerTask('default', ['uglify', 'concat:prod']);
+    grunt.registerTask('default', ['jshint:all', 'uglify', 'concat:prod']);
 
     grunt.loadNpmTasks('grunt-contrib-concat');
 
