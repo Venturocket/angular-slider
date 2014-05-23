@@ -25,6 +25,6 @@ module.exports = function(config){
             'test/*.js'
         ],
         autoWatch: true,
-        browsers: ['firefox']
+        browsers: ['Firefox']
     });
 };
