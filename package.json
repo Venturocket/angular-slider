@@ -4,7 +4,8 @@
     "description": "Slider directive for AngularJS.",
     "main": "",
     "scripts": {
-        "test": "karma start --single-run --no-auto-watch"
+        "test": "karma start --single-run --no-auto-watch",
+        "dev": "karma start --browsers=PhantomJS --reporters=dots"
     },
     "repository": {
         "type": "git",
@@ -21,6 +22,7 @@
         "grunt-contrib-jshint": "~0.6.0",
         "grunt-contrib-nodeunit": "~0.2.0",
         "grunt-contrib-uglify": "~0.2.2",
-        "grunt-contrib-concat": "*"
+        "grunt-contrib-concat": "*",
+        "karma-phantomjs-launcher": "^0.1.4"
     }
 }
