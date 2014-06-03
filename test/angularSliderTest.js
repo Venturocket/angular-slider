@@ -26,12 +26,17 @@ describe("Unit: Slider Directive", function() {
 			beforeEach(function() {
 				$rootScope.skill = {
 					value: 1,
+					draggedValue: 1,
 					translate: function(value) {
 						return '#'+value+'%';
-					}
+					},
+                    drag: function() {
+						$rootScope.skill.draggedValue = $rootScope.skill.value;
+                    }
 				};
 				spyOn($rootScope.skill,'translate').andCallThrough();
-				element = $compile("<slider floor='1' ceiling='3' step='0.25' precision='2' translate-fn='skill.translate' ng-model='skill.value'></slider>")($rootScope);
+				spyOn($rootScope.skill,'drag').andCallThrough();
+				element = $compile("<slider floor='1' ceiling='3' step='0.25' precision='2' translate-fn='skill.translate' ng-model='skill.value' on-drag='skill.drag'></slider>")($rootScope);
 				$rootScope.$digest();
 				$(element).find('span').css({'display':'block','position':'absolute'});
 				$(element).find('.bar').width(500);
@@ -67,9 +72,12 @@ describe("Unit: Slider Directive", function() {
 				pointer.trigger($.Event('mousedown',{clientX: 250}));
 				$(document).trigger($.Event('mousedown',{clientX: 250}));
 				$(document).trigger($.Event('mousemove',{clientX: 125}));
+				expect($rootScope.skill.value).toBe(1.5);
+				expect($rootScope.skill.draggedValue).toBe(1);
 				$(document).trigger($.Event('mouseup',{clientX: 125}));
 
 				expect($rootScope.skill.value).toBe(1.5);
+				expect($rootScope.skill.draggedValue).toBe(1.5);
 				expect(pointer.css('left')).toBe('125px');
 				expect(element.find('.bubble.low').text()).toBe('#1.50%');
 			});
@@ -81,9 +89,12 @@ describe("Unit: Slider Directive", function() {
 				pointer.trigger($.Event('touchstart',{clientX: 250}));
 				$(document).trigger($.Event('touchstart',{clientX: 250}));
 				$(document).trigger($.Event('touchmove',{clientX: 125}));
+				expect($rootScope.skill.value).toBe(1.5);
+				expect($rootScope.skill.draggedValue).toBe(1);
 				$(document).trigger($.Event('touchend',{clientX: 125}));
 
 				expect($rootScope.skill.value).toBe(1.5);
+				expect($rootScope.skill.draggedValue).toBe(1.5);
 				expect(pointer.css('left')).toBe('125px');
 				expect(element.find('.bubble.low').text()).toBe('#1.50%');
 			});
@@ -106,9 +117,12 @@ describe("Unit: Slider Directive", function() {
 				pointer.trigger($.Event('mousedown',{clientX: 250}));
 				$(document).trigger($.Event('mousedown',{clientX: 250}));
 				$(document).trigger($.Event('mousemove',{clientX: 200}));
+				expect($rootScope.skill.value).toBe(1.75);
+				expect($rootScope.skill.draggedValue).toBe(1);
 				$(document).trigger($.Event('mouseup',{clientX: 200}));
 
 				expect($rootScope.skill.value).toBe(1.75);
+				expect($rootScope.skill.draggedValue).toBe(1.75);
 				expect(pointer.css('left')).toBe('187.5px');
 				expect(element.find('.bubble.low').text()).toBe('#1.75%');
 			});
