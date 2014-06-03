@@ -229,6 +229,7 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                     ngModelRange     	: '=',   // dual knob high value binding
 					ngDisabled		 	: '=',   // should the slider be disabled?
 					ngChange			: '&',   // what should we do when a value is changed
+					onDrag  			: '&',   // what should we do when the drag ends
                     translateFn   	 	: '&',   // how to translate the values displayed in the bubbles
                     translateRangeFn   	: '&',   // how to translate the range bubble
                     translateCombinedFn	: '&',   // how to translate the combined bubble 
@@ -349,6 +350,11 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                     // set up the decoding function
                     if(attributes.inverseScaleFn) {
                         attributes.$set('inverseScaleFn', "" + attributes.inverseScaleFn + "(value)");
+                    }
+
+                    // set up the onDrag function
+                    if(attributes.onDrag) {
+                        attributes.$set('onDrag', "" + attributes.onDrag + "()");
                     }
 
                     // set up the background bar so it fills the entire width of the slider
@@ -1182,6 +1188,9 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                     pointer = null;
                                     ref = null;
                                     dragRange = false;
+
+                                    // Fire the event
+                                    scope.$apply(scope.onDrag);
                                 }
 
                                 /**

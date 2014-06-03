@@ -100,8 +100,8 @@
 		<h2>Normal</h2>
 		<h3>Single Knob</h3>
 	    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' stickiness='{{ stickiness }}'
-	            ng-model='value' style="width: {{ sliderWidth }};"></slider>
-		Value: <input ng-model="value" type="text" />
+	            ng-model='value' on-drag='afterDrag' ng-style="{width: sliderWidth}"></slider>
+		Value: <input ng-model="value" type="text" />, after drag: <input ng-model="valueAfterDrag" type="text" />
 		<h3>Dual Knob</h3>
 	    <slider floor='{{ floor }}' ceiling='{{ ceiling }}' step='{{ step }}' precision='{{ precision }}' buffer='{{ buffer }}'
 	            stickiness='{{ stickiness }}' ng-model='values.low' ng-model-range='values.high' translate-fn='translate'
@@ -139,6 +139,7 @@
 	    angular.module('ExampleApp', ['vr.directives.slider']).controller('MainCtrl', ['$scope', function($scope) {
 		    $scope.scopes = [];
 		    $scope.value = 5;
+		    $scope.valueAfterDrag = $scope.value;
 		    $scope.values = {
 			    low : 4,
 			    high: 7
@@ -159,6 +160,10 @@
 				    },
 				    value : 5
 			    });
+		    };
+
+		    $scope.afterDrag = function() {
+			    $scope.valueAfterDrag = $scope.value;
 		    };
 
 		    $scope.translate = function(value) {
