@@ -239,7 +239,7 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                     "<span class='bar full'></span>" + // secondary bars used for dual knobs
                     "<span class='bar steps'><span class='bubble step' ng-repeat='step in stepBubbles()'></span></span>" + // step bubbles
                     "<span class='bar selection'></span><span class='bar unselected low'></span><span class='bar unselected high'></span>" + // the knobs
-                    "<span class='pointer low'></span><span class='pointer high'></span>" + // current value bubbles
+                    "<span class='pointer low'><span class='inner'></span></span><span class='pointer high'><span class='inner'></span></span>" + // current value bubbles
                     "<span class='bubble low'></span><span class='bubble high'></span><span class='bubble middle'></span><span class='bubble selection'></span>" + // low, high, middle and selection bubbles
                     "<span class='bubble limit floor'></span><span class='bubble limit ceiling'></span>" + // upper and lower limit bubbles
                     "<input type='range' class='input low' /><input type='range' class='input high' /><input type='range' class='input selection' />", // range sliders used for browsers that support them
