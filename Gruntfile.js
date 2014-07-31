@@ -2,14 +2,18 @@ module.exports = function(grunt){
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-        srcFiles: [
-            'src/rangeInputSupported.js',
-            'src/angular-slider.js'
-        ],
+        srcFiles: {
+            js: [
+                'src/js/angular-slider*.js'
+            ],
+            less: [
+                'src/js/angular-slider.less'
+            ]
+        },
         concat: {
             prod: {
                 src: ['<%= srcFiles %>'],
-                dest: 'build/<%= pkg.name %>.js'
+                dest: '<%= pkg.name %>.js'
             }
         },
         uglify: {
@@ -18,7 +22,7 @@ module.exports = function(grunt){
             },
             build: {
                 src: ['<%= srcFiles %>'],
-                dest: 'build/<%= pkg.name %>.min.js'
+                dest: '<%= pkg.name %>.min.js'
             }
         }
     });

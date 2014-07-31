@@ -1,6 +1,6 @@
 {
     "name": "angular-slider",
-    "version": "0.3.2",
+    "version": "1.0.0",
     "description": "Slider directive for AngularJS.",
     "main": "",
     "scripts": {
@@ -10,7 +10,7 @@
         "type": "git",
         "url": "git://github.com/Venturocket/angular-slider.git"
     },
-    "author": "Venturocket, Inc.",
+    "author": "Derek Gould",
     "license": "MIT",
     "devDependencies": {
         "karma": "~0.10",
