@@ -3,16 +3,13 @@
     "version": "1.0.0",
     "main": "./angular-slider.js",
     "ignore": [
+		".*",
         "**/.*",
         "node_modules",
-        "components",
+        "bower_components",
         "lib",
         "src",
         "test",
-		".g*",
-		".editorconfig",
-		".jshintrc",
-		".travis.yml",
 		"Gruntfile.js",
 		"karma.conf.js",
 		"*.html"

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Slider for AngularJS</title>
+    <link rel="stylesheet" href="angular-slider.css" />
+</head>
+<body id='ng-app' ng-app="ExampleApp">
+
+	<div id='slider-container' ng-controller="MainCtrl">
+		<ng-slider floor="{{ 50 }}" ceiling="{{ 100 }}" ng-slider-options="options">
+			<ng-slider-knob ng-model="values.low">
+				<span>{{ $viewValue }}</span>
+			</ng-slider-knob>
+			<ng-slider-knob ng-model="values.high">
+				<span>{{ $viewValue }}</span>
+			</ng-slider-knob>
+		</ng-slider>
+		{{ values.low }} <br />
+		{{ values.high }}
+    </div>
+	<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.21/angular.min.js"></script>
+    <script src="src/js/angular-slider_app.js"></script>
+    <script src="src/js/angular-slider_directives.js"></script>
+    <script src="src/js/angular-slider_controllers.js"></script>
+    <script>
+	    angular.module('ExampleApp', ['vr.directives.slider']).controller('MainCtrl', ['$scope', function($scope) {
+		    $scope.scopes = [];
+		    $scope.value = 5;
+		    $scope.values = {
+			    low : 40,
+			    high: 70
+		    };
+		    
+		    $scope.options = {
+			    translate: function(value) {
+				    return '$' + value;
+			    }
+		    };
+		    $scope.scale = function(value) {
+			    return Math.pow(value, 3);
+		    };
+		    $scope.inverseScale = function(value) {
+			    var sign = value == 0?1:(value / Math.abs(value));
+			    return sign * Math.pow(Math.abs(value), 1 / 3);
+		    };
+
+		    $scope.addScope = function() {
+			    $scope.scopes.push({
+				    values: {
+					    low : 4,
+					    high: 7
+				    },
+				    value : 5
+			    });
+		    };
+
+		    $scope.fireResizeEvent = function() {
+			    $scope.$broadcast('refreshSlider');
+		    };
+	    }]);
+    </script>
+</body>
+</html>
