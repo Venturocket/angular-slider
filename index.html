@@ -3,34 +3,82 @@
 <head>
     <title>Slider for AngularJS</title>
     <link rel="stylesheet" href="angular-slider.css" />
+	<style type="text/css">
+		.ng-slider {
+			margin-bottom: 25px;
+		}
+		.ng-slider .ng-slider-knob span {
+			position:  absolute;
+			font-size: 11px;
+		}
+
+		.ng-slider.ng-slider-horizontal .ng-slider-knob span {
+			top:        100%;
+			width:      200%;
+			left:       -50%;
+			text-align: center;
+			line-height: 18px;;
+		}
+
+		.ng-slider.ng-slider-vertical .ng-slider-knob span {
+			top:         0;
+			left:        120%;
+			line-height: 16px;
+		}
+	</style>
 </head>
 <body id='ng-app' ng-app="ExampleApp">
 
-	<div id='slider-container' ng-controller="MainCtrl">
-		<ng-slider floor="{{ 50 }}" ceiling="{{ 100 }}" ng-slider-options="options">
+	<div class='slider-container' ng-controller="MainCtrl">
+		<ng-slider floor="{{min}}" ceiling="{{max}}" ng-slider-options="options">
 			<ng-slider-knob ng-model="values.low">
 				<span>{{ $viewValue }}</span>
 			</ng-slider-knob>
 			<ng-slider-knob ng-model="values.high">
 				<span>{{ $viewValue }}</span>
 			</ng-slider-knob>
+			<ng-slider-knob ng-model="value">
+				<span>{{ $viewValue }}</span>
+			</ng-slider-knob>
 		</ng-slider>
-		{{ values.low }} <br />
-		{{ values.high }}
+		<ng-slider floor="{{min}}" ceiling="{{max}}" ng-slider-options="options">
+			<ng-slider-knob ng-model="values.low">
+				<span>{{ $viewValue }}</span>
+			</ng-slider-knob>
+			<ng-slider-knob ng-model="values.high">
+				<span>{{ $viewValue }}</span>
+			</ng-slider-knob>
+			<ng-slider-knob ng-model="value">
+				<span>{{ $viewValue }}</span>
+			</ng-slider-knob>
+		</ng-slider>
+		<input type="text" ng-model="values.high" />
+		<input type="text" ng-model="values.low" />
+		<input type="text" ng-model="value" /><br />
+		<input type="text" ng-model="min" />
+		<input type="text" ng-model="max" />
     </div>
 	<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.21/angular.min.js"></script>
-    <script src="src/js/angular-slider_app.js"></script>
-    <script src="src/js/angular-slider_directives.js"></script>
-    <script src="src/js/angular-slider_controllers.js"></script>
+    <script src="angular-slider.js"></script>
     <script>
+	    function dump(obj) {
+		    var out = '';
+		    for(var i in obj) {
+			    out += i + ": " + obj[i] + "\n";
+		    }
+
+		    return out;
+	    }
 	    angular.module('ExampleApp', ['vr.directives.slider']).controller('MainCtrl', ['$scope', function($scope) {
 		    $scope.scopes = [];
-		    $scope.value = 5;
+		    $scope.value = 20;
 		    $scope.values = {
-			    low : 40,
-			    high: 70
+			    low : 50,
+			    high: 80
 		    };
-		    
+		    $scope.max = 100;
+		    $scope.min = 0;
+
 		    $scope.options = {
 			    translate: function(value) {
 				    return '$' + value;
@@ -40,22 +88,8 @@
 			    return Math.pow(value, 3);
 		    };
 		    $scope.inverseScale = function(value) {
-			    var sign = value == 0?1:(value / Math.abs(value));
+			    var sign = value == 0 ? 1 : (value / Math.abs(value));
 			    return sign * Math.pow(Math.abs(value), 1 / 3);
-		    };
-
-		    $scope.addScope = function() {
-			    $scope.scopes.push({
-				    values: {
-					    low : 4,
-					    high: 7
-				    },
-				    value : 5
-			    });
-		    };
-
-		    $scope.fireResizeEvent = function() {
-			    $scope.$broadcast('refreshSlider');
 		    };
 	    }]);
     </script>

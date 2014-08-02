@@ -13,25 +13,35 @@ angular.module('vr.directives.slider')
 
         var knobs = [];
 		
-		var currentKnob = null;
+		// we'll use this to tell which knob is currently being moved
+		$scope.slideVars = {
+			mousePosition: 0,
+			sliderSize: 0,
+			sliderOffset: 0
+		};
+		$scope.currentKnob = null;
+		$scope.sliding = false;
 
-        var options = {
+		// set the default options
+		this.options = {
             precision:  0,
             buffer:     0,
             steps:      0,
             stickiness: 3,
-            translate: 	function(val) { return val; },
             scale: 		function(val) { return val; },
-			
-			disabled: 	false
+			continuous: false,
+			vertical: 	false,
+			addBars: 	true
         };
-		this.options = options;
+		var options = this.options;
 
+		// make sure the knobs are all up to date
         function updateKnobs() {
 
         }
 
         this.registerKnob = function(knob) {
+			
 			if(knobs.length > 0) {
 				for(var i = 0; i < knobs.length; i++) {
 					if(knob.ngModel.$modelValue > knobs[i].$modelValue) {
@@ -42,52 +52,66 @@ angular.module('vr.directives.slider')
 			} else {
 				knobs.push(knob);
 			}
+			if(options.addBars) {
+				
+			}
 			
-			$scope.$watch(function() { return knob.ngModel.$modelValue; }, function(value) {
+			function normalizeModel(value) {
 				var normalized = Math.min($scope.ceiling, Math.max(value, $scope.floor));
 				if(normalized == value) {
-					knob.onChange(value, (((value-$scope.floor) / ($scope.ceiling-$scope.floor)) * 100) + "%");
+					knob.onChange(value);
 				} else if(!isNaN(normalized)) {
 					knob.ngModel.$setViewValue(normalized);
+					if(!$scope.$$phase) {
+						$scope.$apply();
+					}
 				}
+			}
+			
+			$scope.$watch(function() { return knob.ngModel.$modelValue; }, function(value) {
+				normalizeModel(value);
 			});
-
-            updateKnobs();
+			
+			$scope.$watch('floor', function() {
+				normalizeModel(knob.ngModel.$modelValue);
+			});
+			$scope.$watch('ceiling', function() {
+				normalizeModel(knob.ngModel.$modelValue);
+			});
 			
 			return {
-				start: function() {
-					if(!currentKnob) {
-						currentKnob = knob.elem;
+				start: function(ev) {
+					if(!$scope.sliding && !$scope.disabled) {
+						$scope.currentKnob = knob;
+						$scope.sliding = true;
+						$scope.onStart(ev);
 					}
 				},
 				destroy: function() {
-					var index = knobs.indexOf(elem);
+					var index = knobs.indexOf(knob);
 					knobs.splice(index, 1);
-					knobs.splice(index, 1);
-		
-					updateKnobs();
-				},
-				disable: function() {},
-				enable: function() {},
+				}
 				
 			}
         };
-    }])
-	.controller('SliderKnobCtrl', ['$scope', function($scope) {
-		$scope.scope = 'blah';
-	}]);
+		
+		this.registerBar = function(bar) {
+			
+		}
+    }]);
 
 /**
  * Created by Derek on 7/31/2014.
  */
 
 angular.module('vr.directives.slider')
-    .directive('ngSlider', ['$parse', function($parse) {
+    .directive('ngSlider', ['$document', '$timeout', function($document, $timeout) {
         return {
             restrict: 'EA',
             controller: 'SliderCtrl',
 			scope: true,
             compile: function(elem, attr) {
+				// check requirements
                 if(angular.isUndefined(attr.floor)) {
                     throw "ngSlider Error: Floor not specified";
                 }
@@ -95,11 +119,49 @@ angular.module('vr.directives.slider')
                     throw "ngSlider Error: Ceiling not specified";
                 }
 
+				// add a class so we can style it
                 elem.addClass('ng-slider');
 
                 return function (scope, elem, attr, ctrl) {
-                    attr.$observe('ngDisabled', function(disabled) {
-                        ctrl.options.disabled = angular.isDefined(disabled) && disabled;
+					
+					scope.dimensions = function() {
+						return {
+							sliderSize: ctrl.options.vertical?elem[0].offsetHeight:elem[0].offsetWidth,
+							sliderOffset: ctrl.options.vertical?elem[0].offsetTop:elem[0].offsetLeft
+						}
+					};
+		
+					ctrl.valueToPercent = function(value, knob) {
+						var knobSize = ctrl.options.vertical?knob[0].offsetHeight:knob[0].offsetWidth;
+						var knobPercent = knobSize / scope.dimensions().sliderSize * 100;
+						return (((value - scope.floor) / (scope.ceiling - scope.floor)) * (100 - knobPercent)) + "%";
+					};
+					
+					scope.onStart = function(ev) {
+						onMove(ev);
+					};
+					
+					function onMove(ev) {
+						var dimensions = scope.dimensions();
+						var position = (ctrl.options.vertical?ev.clientY:ev.clientX) - scope.dimensions().sliderOffset;
+						var knobSize = ctrl.options.vertical?scope.currentKnob.elem[0].offsetHeight:scope.currentKnob.elem[0].offsetWidth;
+						var percent = Math.max(0, Math.min((position-(knobSize/2)) / (dimensions.sliderSize-knobSize), 1));
+						var value = ((percent * (scope.ceiling - scope.floor)) + scope.floor).toFixed(ctrl.options.precision);
+						scope.currentKnob.ngModel.$setViewValue(value);
+						scope.$apply();
+					}
+					
+					function onEnd() {
+						scope.sliding = false;
+					}
+					
+                    scope.$watch(function() { return scope.$eval(attr.ngDisabled); }, function(disabled) {
+                        scope.disabled = angular.isDefined(disabled) && disabled;
+						if(scope.disabled) {
+							elem.addClass('disabled');
+						} else {
+							elem.removeClass('disabled');
+						}
                     });
                     attr.$observe('ceiling', function(ceiling) {
                         ceiling = angular.isDefined(ceiling)?parseFloat(ceiling):0;
@@ -110,13 +172,47 @@ angular.module('vr.directives.slider')
                         scope.floor = isNaN(floor)?0:floor;
                     });
 					
-					scope.$watch(function() { return $parse(attr.ngSliderOptions); }, function(opts) {
-						if(angular.isDefined(opts)) {
-							for(var opt in opts) {
-								ctrl.options[opt] = opts[opt];
-							}
+					scope.$watch(function() { return scope.$eval(attr.ngSliderOptions); }, function(opts) {
+						angular.extend(ctrl.options, angular.isDefined(opts) && angular.isObject(opts)?opts:{});
+						if(ctrl.options.vertical) {
+							elem.addClass('ng-slider-vertical').removeClass('ng-slider-horizontal');
+						} else {
+							elem.addClass('ng-slider-horizontal').removeClass('ng-slider-vertical');
 						}
-					}, true)
+					}, true);
+					
+					var moveEvents = ['mousemove', 'touchmove'];
+                    var cancelEvents = ['mousecancel', 'touchcancel'];
+                    var endEvents = ['mouseup', 'touchend'];
+					
+					if(window.PointerEvent) {
+						moveEvents = ['pointermove'];
+						cancelEvents = ['pointercancel'];
+						endEvents = ['pointerup'];
+					} else if(window.navigator.msPointerEnabled) {
+						moveEvents = ['MSPointerMove'];
+						cancelEvents = ['MSPointerCancel'];
+						endEvents = ['MSPointerUp'];
+					}
+					
+					// handle move
+                    angular.forEach(moveEvents, function(event) {
+						$document.bind(event, function(ev) {
+							if(scope.sliding) {
+								ev.preventDefault();
+								onMove(ev);
+							}
+						});
+					});
+					
+					// handle cancel and end
+                    angular.forEach(cancelEvents.concat(endEvents), function(event) {
+						$document.bind(event, function() {
+							if(scope.sliding) {
+								onEnd();
+							}
+						});
+					});
                 };
             }
         }
@@ -138,41 +234,55 @@ angular.module('vr.directives.slider')
 					
 					var enabled = true;
 					
-                    var knob = ngSliderCtrl.registerKnob({
+					function updateModel(value) {
+						$parse(attr.ngModel).assign(scope.$parent.$parent, value);
+						if(!scope.$$phase) {
+							scope.$apply();
+						}
+					}
+					
+                    scope.knob = ngSliderCtrl.registerKnob({
 						ngModel: ngModelCtrl,
 						elem: elem,
-						onChange: function(modelValue, percent) {
-							scope.$viewValue = ngSliderCtrl.options.translate(modelValue);
-							elem.css('left', percent);
+						onChange: function(value) {
+							updateModel(value);
+							scope.$viewValue = value;
+							elem.css(ngSliderCtrl.options.vertical?'top':'left', ngSliderCtrl.valueToPercent(value, elem));
+						},
+						onStart: function() {
+							elem.addClass('active');
+						},
+						onEnd: function() {
+							elem.removeClass('active');
 						}
 					});
                     elem.bind('$destroy', function() {
-                        knob.destroy();
+                        scope.knob.destroy();
                     });
 					
-					scope.$watch(function() { return $parse(attr.ngDisabled); }, function(disabled) {
+					scope.$watch(function() { return scope.$eval(attr.ngDisabled); }, function(disabled) {
+						enabled = !disabled;
 						if(disabled) {
-							knob.disable();
-							enabled = false;
 							elem.addClass('disabled');
 						} else {
-							knob.enable();
-							enabled = true;
 							elem.removeClass('disabled');
 						}
 					});
+					
+					var events = ['mousedown', 'touchstart'];
+					if(window.PointerEvent) {
+						events = ['pointerdown'];
+					} else if(window.navigator.MSPointerEnabled) {
+						events = ['MSPointerDown']
+					}
 
 					// Start events
-                    angular.forEach(['mousedown', 'touchstart', 'MSPointerStart', 'pointerdown'], function(event) {
+                    angular.forEach(events, function(event) {
                         elem.bind(event, function(ev) {
-							if(!scope.ngDisabled && !ngSliderCtrl.disabled) {
-								knob.start();
-							}
+							ev.preventDefault();
+							scope.knob.start(ev)
                         });
                     });
-                    var moveEvents = ['mousemove', 'touchmove', 'MSPointerMove', 'pointermove'];
-                    var cancelEvents = ['mousecancel', 'touchcancel', 'MSPointerCancel', 'pointercancel'];
-                    var endEvents = ['mouseup', 'touchend', 'MSPointerUp', 'pointerup'];
                 };
             }
         }
@@ -180,18 +290,27 @@ angular.module('vr.directives.slider')
     .directive('ngSliderBar', function() {
         return {
             restrict: 'EA',
-            require: ['^ngSlider'],
-            link: function(scope, elem, attr, ctrl) {
-                ctrl.registerBar(scope, elem);
+            require: '^ngSlider',
+			compile: function(elem, attr) {
+				elem.addClass('ng-slider-bar');
+				
+				return function(scope, elem, attr, ngSliderCtrl) {
+					var bar = ngSliderCtrl.registerBar({
+						scope: scope,
+						attr: attr
+					});
 
-                elem.bind('$destroy', function() {
-                    ctrl.destroyBar(elem);
-                });
-            }
-        }
-    })
-    .directive('vrSliderGroup', function() {
-        return {
-            restrict: 'EA'
+					elem.bind('$destroy', function() {
+						bar.destroy();
+					});
+					
+					attr.$observe('low', function(low) {
+						bar.updateLow(low);
+					});
+					attr.$observe('high', function(high) {
+						bar.updateHigh(high);
+					});
+				}
+			}
         }
     });

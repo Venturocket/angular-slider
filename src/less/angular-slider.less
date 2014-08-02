@@ -1,18 +1,49 @@
+@bar-height: 10px;
+@bar-width: 500px;
+@knob-size: 16px;
+
 .ng-slider {
     position:         relative;
     display:          block;
-    width:            500px;
-    height:           20px;
-    background-color: #ccc;
+    background-color: #eee;
+    border:           1px solid #ddd;
+    margin:           (@knob-size - @bar-height)/2 0;
+    border-radius:    @bar-height/2;
+
+    &.ng-slider-horizontal {
+        width:  @bar-width;
+        height: @bar-height;
+
+        .ng-slider-knob {
+            top:  ((@knob-size - @bar-height)/-2) - 1px;
+        }
+    }
+    &.ng-slider-vertical {
+        width:  @bar-height;
+        height: @bar-width;
+
+        .ng-slider-knob {
+            left:  ((@knob-size - @bar-height)/-2) - 1px;
+        }
+    }
+
+    &, & * {
+        box-sizing: border-box;
+    }
 
     .ng-slider-knob {
         position:         absolute;
         display:          block;
-        height:           20px;
-        width:            20px;
-        background-color: #58f;
-        color:            #fff;
-        left:             0;
-        top:              0;
+        height:           @knob-size;
+        width:            @knob-size;
+        background-color: #ccc;
+        border:           1px solid #aaa;
+        border-radius:    @knob-size/2;
+
+        &:hover, &:focus {
+            background-color: #bbb;
+            border-color:     #999;
+            cursor:           pointer;
+        }
     }
 }

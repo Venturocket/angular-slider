@@ -7,25 +7,35 @@ angular.module('vr.directives.slider')
 
         var knobs = [];
 		
-		var currentKnob = null;
+		// we'll use this to tell which knob is currently being moved
+		$scope.slideVars = {
+			mousePosition: 0,
+			sliderSize: 0,
+			sliderOffset: 0
+		};
+		$scope.currentKnob = null;
+		$scope.sliding = false;
 
-        var options = {
+		// set the default options
+		this.options = {
             precision:  0,
             buffer:     0,
             steps:      0,
             stickiness: 3,
-            translate: 	function(val) { return val; },
             scale: 		function(val) { return val; },
-			
-			disabled: 	false
+			continuous: false,
+			vertical: 	false,
+			addBars: 	true
         };
-		this.options = options;
+		var options = this.options;
 
+		// make sure the knobs are all up to date
         function updateKnobs() {
 
         }
 
         this.registerKnob = function(knob) {
+			
 			if(knobs.length > 0) {
 				for(var i = 0; i < knobs.length; i++) {
 					if(knob.ngModel.$modelValue > knobs[i].$modelValue) {
@@ -36,37 +46,50 @@ angular.module('vr.directives.slider')
 			} else {
 				knobs.push(knob);
 			}
+			if(options.addBars) {
+				
+			}
 			
-			$scope.$watch(function() { return knob.ngModel.$modelValue; }, function(value) {
+			function normalizeModel(value) {
 				var normalized = Math.min($scope.ceiling, Math.max(value, $scope.floor));
 				if(normalized == value) {
-					knob.onChange(value, (((value-$scope.floor) / ($scope.ceiling-$scope.floor)) * 100) + "%");
+					knob.onChange(value);
 				} else if(!isNaN(normalized)) {
 					knob.ngModel.$setViewValue(normalized);
+					if(!$scope.$$phase) {
+						$scope.$apply();
+					}
 				}
+			}
+			
+			$scope.$watch(function() { return knob.ngModel.$modelValue; }, function(value) {
+				normalizeModel(value);
 			});
-
-            updateKnobs();
+			
+			$scope.$watch('floor', function() {
+				normalizeModel(knob.ngModel.$modelValue);
+			});
+			$scope.$watch('ceiling', function() {
+				normalizeModel(knob.ngModel.$modelValue);
+			});
 			
 			return {
-				start: function() {
-					if(!currentKnob) {
-						currentKnob = knob.elem;
+				start: function(ev) {
+					if(!$scope.sliding && !$scope.disabled) {
+						$scope.currentKnob = knob;
+						$scope.sliding = true;
+						$scope.onStart(ev);
 					}
 				},
 				destroy: function() {
-					var index = knobs.indexOf(elem);
+					var index = knobs.indexOf(knob);
 					knobs.splice(index, 1);
-					knobs.splice(index, 1);
-		
-					updateKnobs();
-				},
-				disable: function() {},
-				enable: function() {},
+				}
 				
 			}
         };
-    }])
-	.controller('SliderKnobCtrl', ['$scope', function($scope) {
-		$scope.scope = 'blah';
-	}]);
+		
+		this.registerBar = function(bar) {
+			
+		}
+    }]);
