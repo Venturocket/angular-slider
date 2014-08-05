@@ -4,7 +4,7 @@
   "description": "Slider directive for AngularJS.",
   "main": "",
   "scripts": {
-    "test": "karma start --single-run --no-auto-watch --browsers Firefox"
+    "test": "./node_modules/.bin/karma start --single-run --no-auto-watch --browsers Firefox"
   },
   "repository": {
     "type": "git",
