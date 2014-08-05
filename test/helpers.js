@@ -5,7 +5,7 @@
  * Time: 12:12 PM
  * To change this template use File | Settings | File Templates.
  */
-beforeEach(function(){
+/*beforeEach(function(){
     this.addMatchers({
         toHaveClass: function(cls){
             this.message = function(){
@@ -14,4 +14,4 @@ beforeEach(function(){
             return this.actual.hasClass(cls);
         }
     });
-});
+});*/

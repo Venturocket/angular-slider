@@ -1,0 +1,76 @@
+@import "../angular-slider";
+
+@bar-height: 10px;
+@bar-width: 500px;
+@bar-border-size: 1px;
+@knob-size: 16px;
+@knob-border-size: 1px;
+
+.ng-slider {
+    background-color: #eee;
+    border:           @bar-border-size solid #ddd;
+    margin:           (@knob-size - @bar-height)/2 0;
+    border-radius:    @bar-height/2;
+
+    &.ng-slider-horizontal {
+        width:  @bar-width;
+        height: @bar-height;
+
+        .ng-slider-knob {
+            top: ((@knob-size - @bar-height)/-2) - 1px;
+        }
+
+        .ng-slider-bar {
+            height: 100%;
+
+            &:first-of-type {
+                border-radius: @bar-height/2 0 0 @bar-height/2;
+            }
+            &:last-of-type {
+                border-radius: 0 @bar-height/2 @bar-height/2 0;
+            }
+        }
+    }
+    &.ng-slider-vertical {
+        width:  @bar-height;
+        height: @bar-width;
+
+        .ng-slider-knob {
+            left: ((@knob-size - @bar-height)/-2) - 1px;
+        }
+
+        .ng-slider-bar {
+            width: 100%;
+
+            &:first-of-type {
+                border-radius: @bar-height/2 @bar-height/2 0 0;
+            }
+            &:last-of-type {
+                border-radius: 0 0 @bar-height/2 @bar-height/2;
+            }
+        }
+    }
+
+    .ng-slider-knob {
+        height:           @knob-size;
+        width:            @knob-size;
+        background-color: #ccc;
+        border:           @knob-border-size solid #aaa;
+        border-radius:    @knob-size/2;
+
+        &:hover, &:focus {
+            background-color: #bbb;
+            border-color:     #999;
+            cursor:           pointer;
+        }
+        
+        &.active {
+            background-color: #67f;
+            border-color: #568;
+        }
+    }
+
+    .ng-slider-bar {
+        background-color: #c33;
+    }
+}

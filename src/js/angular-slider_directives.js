@@ -31,7 +31,7 @@ angular.module('vr.directives.slider')
 					 */
 					scope.onStart = function(ev) {
 						// fire a "move"
-						onMove(ev);
+						scope.onMove(ev);
 					};
 
 					/**
@@ -149,7 +149,7 @@ angular.module('vr.directives.slider')
             }
         }
     }])
-    .directive('ngSliderKnob', ['$parse', function($parse) {
+    .directive('ngSliderKnob', ['$parse', '$timeout', function($parse, $timeout) {
         return {
             restrict: 'EA',
             require: ['^ngSlider', '^ngModel'],
@@ -176,7 +176,7 @@ angular.module('vr.directives.slider')
 					 * @param value {number}
 					 */
 					function updateModel(value) {
-						$parse(attr.ngModel).assign(scope.$parent.$parent, value);
+						$parse(attr.ngModel).assign(scope.$parent.$parent, parseFloat(value));
 						if(!scope.$$phase) {
 							scope.$apply();
 						}

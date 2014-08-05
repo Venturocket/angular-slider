@@ -21,6 +21,8 @@
     "grunt-contrib-uglify": "*",
     "grunt-contrib-concat": "*",
     "grunt-contrib-less": "*",
-    "grunt-contrib-watch": "*"
+    "grunt-contrib-watch": "*",
+    "grunt-karma": "^0.8.3",
+    "load-grunt-tasks": "^0.6.0"
   }
 }

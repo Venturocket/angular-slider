@@ -193,15 +193,13 @@ angular.module('vr.directives.slider')
 			 * @param value {number}
 			 */
 			function normalizeModel(value) {
-				// make sure we have a real number
-				value = parseFloat(value);
 				
 				// initialize the bounds
 				var ceiling = $scope.ceiling;
 				var floor = $scope.floor;
 				
 				// start with the original value
-				var normalized = value;
+				var normalized = parseFloat(value);
 				
 				// get the index of the knob so we know the surrounding knobs
 				var index = $scope.knobs.indexOf(knob);
@@ -258,7 +256,7 @@ angular.module('vr.directives.slider')
 					normalized = parseFloat(normalized.toFixed(options.precision));
 				}
 				
-				if(normalized == value) {
+				if(normalized === value) {
 					// the normalized value is the same as the original, fire the onChange callback for this knob
 					knob.onChange && knob.onChange(value);
 				} else if(!isNaN(normalized)) {
@@ -292,6 +290,7 @@ angular.module('vr.directives.slider')
 			// watch this knob's model for changes
 			$scope.$watch(function() { return knob.ngModel.$modelValue; }, function(value) {
 				update(value);
+				
 			});
 
 			// watch for updates on the slider and update accordingly
