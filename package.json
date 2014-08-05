@@ -4,7 +4,7 @@
   "description": "Slider directive for AngularJS.",
   "main": "",
   "scripts": {
-    "test": "karma start --single-run --no-auto-watch --browsers PhantomJS"
+    "test": "karma start --single-run --no-auto-watch --browsers Firefox"
   },
   "repository": {
     "type": "git",
@@ -16,6 +16,7 @@
     "karma": "*",
     "karma-jasmine": "^0.2.2",
     "karma-phantomjs-launcher": "*",
+    "karma-firefox-launcher": "*",
     "grunt": "*",
     "grunt-contrib-uglify": "*",
     "grunt-contrib-concat": "*",
