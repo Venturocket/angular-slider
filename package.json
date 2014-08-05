@@ -1,26 +1,25 @@
 {
-    "name": "angular-slider",
-    "version": "1.0.0",
-    "description": "Slider directive for AngularJS.",
-    "main": "",
-    "scripts": {
-        "test": "karma start --single-run --no-auto-watch"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git://github.com/Venturocket/angular-slider.git"
-    },
-    "author": "Derek Gould",
-    "license": "MIT",
-    "devDependencies": {
-        "karma": "~0.10",
-        "karma-jasmine": "*",
-        "karma-chrome-launcher": "*",
-        "karma-firefox-launcher": "*",
-        "grunt": "~0.4.1",
-        "grunt-contrib-jshint": "~0.6.0",
-        "grunt-contrib-nodeunit": "~0.2.0",
-        "grunt-contrib-uglify": "~0.2.2",
-        "grunt-contrib-concat": "*"
-    }
+  "name": "angular-slider",
+  "version": "1.0.0-beta.1",
+  "description": "Slider directive for AngularJS.",
+  "main": "",
+  "scripts": {
+    "test": "karma start --single-run --no-auto-watch --browsers PhantomJS"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Venturocket/angular-slider.git"
+  },
+  "author": "Derek Gould",
+  "license": "MIT",
+  "devDependencies": {
+    "karma": "*",
+    "karma-jasmine": "^0.2.2",
+    "karma-phantomjs-launcher": "*",
+    "grunt": "*",
+    "grunt-contrib-uglify": "*",
+    "grunt-contrib-concat": "*",
+    "grunt-contrib-less": "*",
+    "grunt-contrib-watch": "*"
+  }
 }

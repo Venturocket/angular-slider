@@ -25,6 +25,13 @@
 			left:        120%;
 			line-height: 16px;
 		}
+		
+		.ng-slider .ng-slider-bar:nth-child(even) {
+			opacity: 0.6;
+		}
+		.ng-slider .ng-slider-bar:nth-child(odd) {
+			opacity: 0.3;
+		}
 	</style>
 </head>
 <body id='ng-app' ng-app="ExampleApp">
@@ -40,21 +47,14 @@
 			<ng-slider-knob ng-model="value">
 				<span>{{ $viewValue }}</span>
 			</ng-slider-knob>
-		</ng-slider>
-		<ng-slider floor="{{min}}" ceiling="{{max}}" ng-slider-options="options">
-			<ng-slider-knob ng-model="values.low">
-				<span>{{ $viewValue }}</span>
-			</ng-slider-knob>
-			<ng-slider-knob ng-model="values.high">
-				<span>{{ $viewValue }}</span>
-			</ng-slider-knob>
-			<ng-slider-knob ng-model="value">
+			<ng-slider-knob ng-model="value2">
 				<span>{{ $viewValue }}</span>
 			</ng-slider-knob>
 		</ng-slider>
 		<input type="text" ng-model="values.high" />
 		<input type="text" ng-model="values.low" />
-		<input type="text" ng-model="value" /><br />
+		<input type="text" ng-model="value" />
+		<input type="text" ng-model="value2" /><br />
 		<input type="text" ng-model="min" />
 		<input type="text" ng-model="max" />
     </div>
@@ -72,6 +72,7 @@
 	    angular.module('ExampleApp', ['vr.directives.slider']).controller('MainCtrl', ['$scope', function($scope) {
 		    $scope.scopes = [];
 		    $scope.value = 20;
+		    $scope.value2 = 90;
 		    $scope.values = {
 			    low : 50,
 			    high: 80
@@ -82,7 +83,10 @@
 		    $scope.options = {
 			    translate: function(value) {
 				    return '$' + value;
-			    }
+			    },
+			    buffer: 1,
+			    steps: 13,
+			    precision: 2
 		    };
 		    $scope.scale = function(value) {
 			    return Math.pow(value, 3);

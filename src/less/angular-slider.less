@@ -1,12 +1,14 @@
 @bar-height: 10px;
 @bar-width: 500px;
+@bar-border-size: 1px;
 @knob-size: 16px;
+@knob-border-size: 1px;
 
 .ng-slider {
     position:         relative;
     display:          block;
     background-color: #eee;
-    border:           1px solid #ddd;
+    border:           @bar-border-size solid #ddd;
     margin:           (@knob-size - @bar-height)/2 0;
     border-radius:    @bar-height/2;
 
@@ -15,7 +17,18 @@
         height: @bar-height;
 
         .ng-slider-knob {
-            top:  ((@knob-size - @bar-height)/-2) - 1px;
+            top: ((@knob-size - @bar-height)/-2) - 1px;
+        }
+
+        .ng-slider-bar {
+            height: 100%;
+
+            &:first-of-type {
+                border-radius: @bar-height/2 0 0 @bar-height/2;
+            }
+            &:last-of-type {
+                border-radius: 0 @bar-height/2 @bar-height/2 0;
+            }
         }
     }
     &.ng-slider-vertical {
@@ -23,7 +36,18 @@
         height: @bar-width;
 
         .ng-slider-knob {
-            left:  ((@knob-size - @bar-height)/-2) - 1px;
+            left: ((@knob-size - @bar-height)/-2) - 1px;
+        }
+
+        .ng-slider-bar {
+            width: 100%;
+
+            &:first-of-type {
+                border-radius: @bar-height/2 @bar-height/2 0 0;
+            }
+            &:last-of-type {
+                border-radius: 0 0 @bar-height/2 @bar-height/2;
+            }
         }
     }
 
@@ -37,7 +61,7 @@
         height:           @knob-size;
         width:            @knob-size;
         background-color: #ccc;
-        border:           1px solid #aaa;
+        border:           @knob-border-size solid #aaa;
         border-radius:    @knob-size/2;
 
         &:hover, &:focus {
@@ -45,5 +69,16 @@
             border-color:     #999;
             cursor:           pointer;
         }
+        
+        &.active {
+            background-color: #67f;
+            border-color: #568;
+        }
+    }
+
+    .ng-slider-bar {
+        position:         absolute;
+        display:          block;
+        background-color: #c33;
     }
 }

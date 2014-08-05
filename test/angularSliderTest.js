@@ -15,7 +15,7 @@ describe("Unit: Slider Directive", function() {
 		$document = _$document_;
 	}));
 	
-	describe('without range inputs and', function() {
+	/*describe('without range inputs and', function() {
 		
 		beforeEach(function() {
 			AngularSlider = { inputtypes: { range: false } };
@@ -938,6 +938,6 @@ describe("Unit: Slider Directive", function() {
 			expect($rootScope.skill).toBe(2.5);
 		});
 		
-	});
+	});*/
 
 });
