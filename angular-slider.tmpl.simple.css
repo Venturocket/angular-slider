@@ -9,10 +9,14 @@
 .ng-slider .ng-slider-knob {
   position: absolute;
   display: block;
+  -ms-touch-action: none;
+  touch-action: none;
 }
 .ng-slider .ng-slider-bar {
   position: absolute;
   display: block;
+  -ms-touch-action: none;
+  touch-action: none;
 }
 .ng-slider {
   background-color: #eee;

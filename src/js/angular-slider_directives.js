@@ -41,9 +41,14 @@ angular.module('vr.directives.slider')
 					scope.onMove = function(ev) {
 						// get the current dimensions
 						var dimensions = scope.dimensions();
-						
-						// get the current mouse/finger position
-						var position = (ctrl.options.vertical?ev.clientY:ev.clientX) - scope.dimensions().sliderOffset;
+
+                        // get the current mouse position
+                        var position = -scope.dimensions().sliderOffset;
+                        if(ctrl.options.vertical) {
+                            position += ev.clientY || ev.touches[0].clientY;
+                        } else {
+                            position += ev.clientX || ev.touches[0].clientX;
+                        }
 						
 						// get the size of the knob being dragged
 						var knobSize = ctrl.options.vertical?scope.currentKnob.elem[0].offsetHeight:scope.currentKnob.elem[0].offsetWidth;
@@ -95,6 +100,7 @@ angular.module('vr.directives.slider')
 							if(scope.sliding) {
 								// they see me slidin', they hatin'
 								ev.preventDefault();
+                                ev.stopPropagation();
 								scope.onMove(ev);
 							}
 						});
@@ -233,7 +239,9 @@ angular.module('vr.directives.slider')
 					// bind the start events
                     angular.forEach(events, function(event) {
                         elem.bind(event, function(ev) {
+                            console.log(event);
 							ev.preventDefault();
+                            ev.stopPropagation();
 							knob.start(ev)
                         });
                     });

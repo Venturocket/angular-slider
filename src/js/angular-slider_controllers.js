@@ -37,9 +37,15 @@ angular.module('vr.directives.slider')
 		 * @returns {{sliderSize: number, sliderOffset: number}}
 		 */
 		$scope.dimensions = function() {
+            var offset = options.vertical?$element[0].offsetTop:$element[0].offsetLeft;
+
+            if($element[0].offsetParent) {
+                offset = options.vertical?$element[0].offsetParent.offsetTop:$element[0].offsetParent.offsetLeft
+            }
+
 			return {
 				sliderSize: options.vertical?$element[0].offsetHeight:$element[0].offsetWidth,
-				sliderOffset: options.vertical?$element[0].offsetTop:$element[0].offsetLeft
+				sliderOffset: offset
 			}
 		};
 

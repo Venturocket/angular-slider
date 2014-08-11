@@ -47,9 +47,14 @@ angular.module('vr.directives.slider')
 					scope.onMove = function(ev) {
 						// get the current dimensions
 						var dimensions = scope.dimensions();
-						
-						// get the current mouse/finger position
-						var position = (ctrl.options.vertical?ev.clientY:ev.clientX) - scope.dimensions().sliderOffset;
+
+                        // get the current mouse position
+                        var position = -scope.dimensions().sliderOffset;
+                        if(ctrl.options.vertical) {
+                            position += ev.clientY || ev.touches[0].clientY;
+                        } else {
+                            position += ev.clientX || ev.touches[0].clientX;
+                        }
 						
 						// get the size of the knob being dragged
 						var knobSize = ctrl.options.vertical?scope.currentKnob.elem[0].offsetHeight:scope.currentKnob.elem[0].offsetWidth;
@@ -101,6 +106,7 @@ angular.module('vr.directives.slider')
 							if(scope.sliding) {
 								// they see me slidin', they hatin'
 								ev.preventDefault();
+                                ev.stopPropagation();
 								scope.onMove(ev);
 							}
 						});
@@ -239,7 +245,9 @@ angular.module('vr.directives.slider')
 					// bind the start events
                     angular.forEach(events, function(event) {
                         elem.bind(event, function(ev) {
+                            console.log(event);
 							ev.preventDefault();
+                            ev.stopPropagation();
 							knob.start(ev)
                         });
                     });
@@ -339,9 +347,15 @@ angular.module('vr.directives.slider')
 		 * @returns {{sliderSize: number, sliderOffset: number}}
 		 */
 		$scope.dimensions = function() {
+            var offset = options.vertical?$element[0].offsetTop:$element[0].offsetLeft;
+
+            if($element[0].offsetParent) {
+                offset = options.vertical?$element[0].offsetParent.offsetTop:$element[0].offsetParent.offsetLeft
+            }
+
 			return {
 				sliderSize: options.vertical?$element[0].offsetHeight:$element[0].offsetWidth,
-				sliderOffset: options.vertical?$element[0].offsetTop:$element[0].offsetLeft
+				sliderOffset: offset
 			}
 		};
 
