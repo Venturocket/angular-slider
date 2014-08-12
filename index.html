@@ -7,16 +7,17 @@
 		.ng-slider {
 			margin-bottom: 25px;
 		}
+
 		.ng-slider .ng-slider-knob span {
 			position:  absolute;
 			font-size: 11px;
 		}
 
 		.ng-slider.ng-slider-horizontal .ng-slider-knob span {
-			top:        100%;
-			width:      200%;
-			left:       -50%;
-			text-align: center;
+			top:         100%;
+			width:       200%;
+			left:        -50%;
+			text-align:  center;
 			line-height: 18px;;
 		}
 
@@ -25,10 +26,11 @@
 			left:        120%;
 			line-height: 16px;
 		}
-		
+
 		.ng-slider .ng-slider-bar:nth-child(even) {
 			opacity: 0.6;
 		}
+
 		.ng-slider .ng-slider-bar:nth-child(odd) {
 			opacity: 0.3;
 		}
@@ -74,7 +76,7 @@
 		    $scope.value = 20;
 		    $scope.value2 = 90;
 		    $scope.values = {
-			    low : 50,
+			    low:  50,
 			    high: 80
 		    };
 		    $scope.max = 100;
@@ -84,8 +86,8 @@
 			    translate: function(value) {
 				    return '$' + value;
 			    },
-			    buffer: 1,
-			    steps: 13,
+			    buffer:    1,
+			    steps:     13,
 			    precision: 2
 		    };
 		    $scope.scale = function(value) {

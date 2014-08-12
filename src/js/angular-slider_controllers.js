@@ -15,7 +15,8 @@ angular.module('vr.directives.slider')
 		var registeredBars = [];
 		
 		// we'll use this to tell which knob is currently being moved
-		$scope.currentKnob = null;
+		$scope.currentKnobs = [];
+		$scope.startOffsets = [];
 		$scope.sliding = false;
 
 		// set the default options
@@ -37,16 +38,18 @@ angular.module('vr.directives.slider')
 		 * @returns {{sliderSize: number, sliderOffset: number}}
 		 */
 		$scope.dimensions = function() {
+			// get the offset for the slider
             var offset = options.vertical?$element[0].offsetTop:$element[0].offsetLeft;
 
             if($element[0].offsetParent) {
-                offset = options.vertical?$element[0].offsetParent.offsetTop:$element[0].offsetParent.offsetLeft
+				// take into account the offset of this element's parent
+                offset += options.vertical?$element[0].offsetParent.offsetTop:$element[0].offsetParent.offsetLeft;
             }
 
 			return {
-				sliderSize: options.vertical?$element[0].offsetHeight:$element[0].offsetWidth,
+				sliderSize: options.vertical?$element[0].offsetHeight:$element[0].offsetWidth,	// get the size of the slider
 				sliderOffset: offset
-			}
+			};
 		};
 
 		/**
@@ -132,8 +135,8 @@ angular.module('vr.directives.slider')
 
 			// update the knobs and fire the change callback for all registered bars
 			angular.forEach(registeredBars, function(bar, index) {
-				bar.scope.lowKnob = index>0?$scope.knobs[index-1].elem:null;
-				bar.scope.highKnob = index<$scope.knobs.length?$scope.knobs[index].elem:null;
+				bar.scope.lowKnob = index>0?$scope.knobs[index-1]:null;
+				bar.scope.highKnob = index<$scope.knobs.length?$scope.knobs[index]:null;
 				bar.onChange && bar.onChange();
 			});
 		}
@@ -179,7 +182,7 @@ angular.module('vr.directives.slider')
 		/**
 		 * Add the knob to the slider and return some useful functions
 		 * @param knob {object}
-		 * @returns {{start: start, destroy: destroy}}
+		 * @returns {{start: start, disabled: disabled}}
 		 */
         this.registerKnob = function(knob) {
 			
@@ -322,16 +325,21 @@ angular.module('vr.directives.slider')
 			// give the knob some useful functions
 			return {
 				start  : function(ev) {
-					if(!$scope.sliding && !$scope.disabled) {
-						$scope.currentKnob = knob;
+					if(!$scope.disabled) {
+						if(angular.isDefined(ev.targetTouches)) {
+							$scope.currentKnobs[ev.targetTouches[0].identifier] = [knob];
+						} else {
+							$scope.currentKnobs[0] = [knob];
+						}
 						$scope.sliding = true;
 						$scope.onStart(ev);
 						knob.onStart();
 					}
 				},
 				disabled: function() {
-					if($scope.sliding && $scope.currentKnob == knob) {
-						$scope.onEnd();
+					var index = $scope.currentKnobs.indexOf(knob);
+					if($scope.sliding && index >= 0) {
+						$scope.onEnd(index);
 					}
 				}
 			}
@@ -340,6 +348,7 @@ angular.module('vr.directives.slider')
 		/**
 		 * Add the bar to the slider
 		 * @param bar {object}
+		 * @return {{start: start}}
 		 */
 		this.registerBar = function(bar) {
 			// add the bar to the list
@@ -351,6 +360,28 @@ angular.module('vr.directives.slider')
 				if(index >= 0) {
 					registeredBars.splice(index, 1);
 				}
-			})
+			});
+			
+			return {
+				start: function(ev) {
+					if(!$scope.disabled) {
+						var knobs = [];
+						if(bar.scope.lowKnob) {
+							knobs.push(bar.scope.lowKnob);
+						}
+						if(bar.scope.highKnob) {
+							knobs.push(bar.scope.highKnob);
+						}
+						if(angular.isDefined(ev.targetTouches)) {
+							$scope.currentKnobs[ev.targetTouches[0].identifier] = knobs;
+						} else {
+							$scope.currentKnobs[0] = knobs;
+						}
+						$scope.sliding = true;
+						$scope.onStart(ev);
+						bar.onStart();
+					}
+				}
+			}
 		}
     }]);
