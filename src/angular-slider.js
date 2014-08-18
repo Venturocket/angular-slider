@@ -333,12 +333,12 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
 
                     // set up the translation function for the range bubble
                     if(attributes.translateRangeFn) {
-                        attributes.$set('translateRangeFnFn', "" + attributes.translateRangeFn + "(low,high)");
+                        attributes.$set('translateRangeFn', "" + attributes.translateRangeFn + "(low,high)");
                     }
 
                     // set up the translation function for the center bubble
                     if(attributes.translateCombinedFn) {
-                        attributes.$set('translateCombinedFnFn', "" + attributes.translateCombinedFn + "(low,high)");
+                        attributes.$set('translateCombinedFn', "" + attributes.translateCombinedFn + "(low,high)");
                     }
 
                     // set up the encoding function
