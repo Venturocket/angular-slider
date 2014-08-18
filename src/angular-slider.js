@@ -246,7 +246,7 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
 
                 compile: function(element, attributes) {
                     // are we gonna show the step bubbles?
-                    var showSteps = attributes.showSteps;
+                    var showSteps = attributes.showSteps !== 'false' && attributes.showSteps !== '';
 					
 					// are we using 'step' or 'step-width'?
 					var stepWidth = attributes.stepWidth?'stepWidth':'step';
