@@ -246,7 +246,7 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
 
                 compile: function(element, attributes) {
                     // are we gonna show the step bubbles?
-                    var showSteps = attributes.showSteps;
+                    var showSteps = attributes.showSteps !== 'false' && attributes.showSteps !== '';
 					
 					// are we using 'step' or 'step-width'?
 					var stepWidth = attributes.stepWidth?'stepWidth':'step';
@@ -333,12 +333,12 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
 
                     // set up the translation function for the range bubble
                     if(attributes.translateRangeFn) {
-                        attributes.$set('translateRangeFnFn', "" + attributes.translateRangeFn + "(low,high)");
+                        attributes.$set('translateRangeFn', "" + attributes.translateRangeFn + "(low,high)");
                     }
 
                     // set up the translation function for the center bubble
                     if(attributes.translateCombinedFn) {
-                        attributes.$set('translateCombinedFnFn', "" + attributes.translateCombinedFn + "(low,high)");
+                        attributes.$set('translateCombinedFn', "" + attributes.translateCombinedFn + "(low,high)");
                     }
 
                     // set up the encoding function
