@@ -173,3 +173,7 @@ A few notes:
 - `ngChange` support ([docs](http://docs.angularjs.org/api/ng/directive/ngChange))
 - `ngDisabled` support ([docs](http://docs.angularjs.org/api/ng/directive/ngDisabled))
 - implements `ngModelController` for form validation and dirty/pristine states ([docs](http://docs.angularjs.org/api/ng/type/ngModel.NgModelController))
+
+## Development
+
+Run `npm install`, then `bower install` and then `npm run dev` for continuously running the tests in PhantomJS whilst developing.

@@ -2,7 +2,7 @@ node_modules
 dist
 .tmp
 .sass-cache
-app/components
+bower_components
 npm-debug.log
 
 #IDE
