@@ -1,4 +1,7 @@
 ## modified in fork
+- Added touch event check in onMove() and onStart()
+
+## modified in JulianWielga fork
 - Single knob selection bar (SPAN.bar.unselected.low)
 
 # angular-slider [![Build Status](https://secure.travis-ci.org/Venturocket/angular-slider.png?branch=master)](http://travis-ci.org/Venturocket/angular-slider)
