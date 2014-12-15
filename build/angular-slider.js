@@ -1767,7 +1767,8 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                         bindSwipeStart(refs.minPtr, refLow);
                                         bindSwipeStart(refs.lowBub, refLow);
                                         bindSwipeStart(refs.flrBub, refLow, refs.minPtr);
-										bindSwipeStart(refs.unSelBarLow, refLow, refs.minPtr);
+                                        bindSwipeStart(refs.unSelBarLow, refLow, refs.minPtr);
+                                        bindSwipeStart(refs.stepBubs, refLow, refs.minPtr);
                                         if(isDualKnob) {
                                             // bind the dual knob specific events to the dual knob specific elements
                                             bindSwipeStart(refs.maxPtr, refHigh);

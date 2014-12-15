@@ -42,11 +42,11 @@ describe('Unit: Slider Directive', function() {
 
 
 			it('should create a new non-range slider', function() {
-				expect(element.find('span').length).toBe(6);
+				expect(element.find('span').length).toBe(7);
 
 				// should be only one bar
 				var bar = element.find('.bar');
-				expect(bar.length).toBe(2);
+				expect(bar.length).toBe(3);
 				expect(bar).toHaveClass('full');
 
 				// should be only one pointer, and it should be in the right position
@@ -344,12 +344,12 @@ describe('Unit: Slider Directive', function() {
 
 
 			it('should create a new non-range slider', function() {
-				expect(element.find('span').length).toBe(6);
+				expect(element.find('span').length).toBe(7);
 				expect(element.find('input').length).toBe(1);
 
 				// should be only one bar
 				var bar = element.find('.bar');
-				expect(bar.length).toBe(2);
+				expect(bar.length).toBe(3);
 				expect(bar).toHaveClass('full');
 
 				// should be only one pointer, and it should be in the right position
