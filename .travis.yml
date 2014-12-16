@@ -8,8 +8,13 @@ before_script:
   - npm install -g karma
   - npm install -g bower
   - npm install -g grunt-cli
+
+install:
+  - npm install
   - bower install
 
-script:
+before_script:
   - grunt
+
+script:
   - karma start --no-auto-watch --single-run --reporters dots --browsers Firefox

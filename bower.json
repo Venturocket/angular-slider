@@ -1,7 +1,7 @@
 {
   "name": "touk-angular-slider",
   "version": "0.3.3",
-  "main": "./build/angular-slider.js",
+  "main": "./build/touk-angular-slider.js",
   "ignore": [
     "**/.*",
     "node_modules",

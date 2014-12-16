@@ -12,8 +12,9 @@ module.exports = function(config){
             'bower_components/angular-mocks/angular-mocks.js',
 
             //our directive(s)
-            'src/rangeInputSupported.js',
-            'src/angular-slider.js',
+            //'src/rangeInputSupported.js',
+            //'src/angular-slider.js',
+            'build/touk-angular-slider.js',
 
             //tests
             'test/*.js'
