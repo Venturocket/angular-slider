@@ -1,6 +1,6 @@
 {
-  "name": "angular-slider",
-  "version": "0.3.2",
+  "name": "touk-angular-slider",
+  "version": "0.3.3",
   "main": "./build/angular-slider.js",
   "ignore": [
     "**/.*",
@@ -18,14 +18,15 @@
     "*.html"
   ],
   "dependencies": {
-    "angular": "~1.2",
-    "angular-touch": "git@github.com:CrossLead/bower-angular-touch.git#42cc919cf4"
+    "angular": ">= 1.2 < 1.4",
+    "angular-touch": ">= 1.2 < 1.4"
   },
   "devDependencies": {
     "angular-mocks": "*",
-    "angular-scenario": "*"
+    "angular-scenario": "*",
+    "jquery": ">= 2.1 < 2.2"
   },
   "resolutions": {
-    "angular": "1.3.6-build.3654+sha.32806ca"
+    "angular": ">= 1.2 < 1.4"
   }
 }

@@ -1186,6 +1186,16 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                 }
 
                                 /**
+                                 * Get X coord from click, touch etc. event
+                                 * @param {object} event
+                                 * @returns {number}
+                                 */
+                                function getXFromEvent(event) {
+                                    var _ref, _ref1, _ref2;
+                                    return event.clientX || event.x || ((_ref = event.touches) != null ? _ref[0].clientX : void 0) || ((_ref1 = event.originalEvent) != null ? (_ref2 = _ref1.touches) != null ? _ref2[0].clientX : void 0 : void 0);
+                                }
+
+                                /**
                                  * What to do when the knob/bar is moved
                                  * @param {object} event
                                  */
@@ -1199,7 +1209,7 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                              * The current x position of the mouse/finger/etc.
                                              * @type {number}
                                              */
-                                            var currentX = event.clientX || event.x || (event.touches ? event.touches[0].clientX : event.originalEvent.touches[0].clientX);
+                                            var currentX = getXFromEvent(event);
 
                                             if(dragRange) {
                                                 // the entire range is being dragged
@@ -1378,6 +1388,8 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
 												scope.ngChange();
 											}
 											ctrl.$setViewValue(scope[refLow]);
+                                            ctrl.$setDirty();
+                                            ctrl .$setTouched();
 
                                             // update the DOM
                                             setPointers();
@@ -1405,7 +1417,7 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
 									 * The current x position of the mouse/finger/etc.
 									 * @type {number}
 									 */
-									var currentX = event.clientX || event.x || (event.touches ? event.touches[0].clientX : event.originalEvent.touches[0].clientX);
+                                    var currentX = getXFromEvent(event);
 
                                     // save the pointer reference
                                     pointer = ptr;

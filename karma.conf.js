@@ -6,7 +6,7 @@ module.exports = function(config){
 
         files: [
             //libraries
-            'lib/jquery-2.0.3.min.js',
+            'bower_components/jquery/dist/jquery.js',
             'bower_components/angular/angular.js',
             'bower_components/angular-touch/angular-touch.js',
             'bower_components/angular-mocks/angular-mocks.js',
@@ -19,6 +19,6 @@ module.exports = function(config){
             'test/*.js'
         ],
         autoWatch: true,
-        browsers: ['Firefox']
+        browsers: ['Firefox', 'PhantomJS', 'Chrome']
     });
 };

@@ -1,6 +1,6 @@
 {
-    "name": "angular-slider",
-    "version": "0.3.2",
+    "name": "touk-angular-slider",
+    "version": "0.3.3",
     "description": "Slider directive for AngularJS.",
     "main": "",
     "scripts": {
@@ -9,9 +9,9 @@
     },
     "repository": {
         "type": "git",
-        "url": "git://github.com/Venturocket/angular-slider.git"
+        "url": "git://github.com/JulianWielga/angular-slider.git"
     },
-    "author": "Venturocket, Inc.",
+    "author": "Julian Wielga",
     "license": "MIT",
     "devDependencies": {
         "karma": "~0.10",
