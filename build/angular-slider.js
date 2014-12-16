@@ -1417,7 +1417,7 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                              * The current x position of the mouse/finger/etc.
                                              * @type {number}
                                              */
-                                            var currentX = event.clientX || event.x;
+                                            var currentX = event.clientX || event.x || (event.touches ? event.touches[0].clientX : event.originalEvent.touches[0].clientX);
 
                                             if(dragRange) {
                                                 // the entire range is being dragged
@@ -1623,7 +1623,7 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
 									 * The current x position of the mouse/finger/etc.
 									 * @type {number}
 									 */
-									var currentX = event.clientX || event.x;
+									var currentX = event.clientX || event.x || (event.touches ? event.touches[0].clientX : event.originalEvent.touches[0].clientX);
 
                                     // save the pointer reference
                                     pointer = ptr;
