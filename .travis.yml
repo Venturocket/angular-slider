@@ -10,4 +10,5 @@ before_script:
   - bower install
 
 script:
+  - grunt
   - karma start --no-auto-watch --single-run --reporters dots --browsers Firefox
