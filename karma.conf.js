@@ -1,6 +1,6 @@
-module.exports = function(config){
+module.exports = function (config) {
     'use strict';
-    config.set({
+    var configuration = {
         basePath: '',
         frameworks: ['jasmine'],
 
@@ -20,6 +20,19 @@ module.exports = function(config){
             'test/*.js'
         ],
         autoWatch: true,
-        browsers: ['Firefox', 'PhantomJS', 'Chrome']
-    });
+        browsers: ['Firefox', 'PhantomJS', 'Chrome', 'ChromeCanary'],
+        customLaunchers: {
+            Chrome_travis_ci: {
+                base: 'Chrome',
+                flags: ['--no-sandbox']
+            }
+        }
+    };
+
+    if (process.env.TRAVIS) {
+        configuration.browsers = ['Chrome_travis_ci'];
+    }
+
+    config.set(configuration);
+
 };

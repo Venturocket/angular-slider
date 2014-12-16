@@ -16,14 +16,14 @@
     "devDependencies": {
         "karma": "~0.10",
         "karma-jasmine": "~0.1.0",
-        "karma-chrome-launcher": "*",
-        "karma-firefox-launcher": "*",
         "grunt": "~0.4.1",
         "grunt-contrib-jshint": "^0.10.0",
         "grunt-contrib-nodeunit": "~0.2.0",
         "grunt-contrib-uglify": "~0.2.2",
         "grunt-contrib-concat": "*",
         "jshint-stylish": "^0.2.0",
-        "karma-phantomjs-launcher": "^0.1.4"
+        "karma-chrome-launcher": "*",
+        "karma-firefox-launcher": "*",
+        "karma-phantomjs-launcher": "*"
     }
 }
