@@ -4,7 +4,7 @@
 ## modified in fork
 - Single knob selection bar (SPAN.bar.unselected.low)
 
-# angular-slider [![Build Status](https://secure.travis-ci.org/Venturocket/angular-slider.png?branch=master)](http://travis-ci.org/Venturocket/angular-slider)
+# angular-slider [![Build Status](https://travis-ci.org/JulianWielga/angular-slider.svg?branch=master)](https://travis-ci.org/JulianWielga/angular-slider)
 Slider directive for AngularJS. https://venturocket.github.io/angular-slider  
 License: MIT
 
@@ -27,7 +27,7 @@ you can start using `step-width` now and save yourself a bit of migration work l
 ## Installation
 
 ```
-bower install venturocket-angular-slider
+bower install touk-angular-slider
 ```
 
 ## Usage
