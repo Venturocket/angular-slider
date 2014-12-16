@@ -17,4 +17,4 @@ before_script:
   - grunt
 
 script:
-  - karma start --no-auto-watch --single-run --reporters dots --browsers Firefox
+  - karma start --no-auto-watch --single-run --reporters dots

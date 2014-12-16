@@ -5,7 +5,7 @@
 - Single knob selection bar (SPAN.bar.unselected.low)
 
 # angular-slider [![Build Status](https://travis-ci.org/JulianWielga/angular-slider.svg?branch=master)](https://travis-ci.org/JulianWielga/angular-slider)
-Slider directive for AngularJS. https://venturocket.github.io/angular-slider  
+Slider directive for AngularJS. https://julianwielga.github.io/angular-slider  
 License: MIT
 
 ## Features
