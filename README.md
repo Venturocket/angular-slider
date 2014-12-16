@@ -41,10 +41,10 @@ Add `<script>`s to your `html` files for [angular](https://github.com/angular/bo
 <script src="build/angular-slider.min.js"></script>
 ```
 
-And add `vr.directives.slider` as a dependency for your app:
+And add `touk.slider` as a dependency for your app:
 
 ```javascript
-angular.module('myApp', ['vr.directives.slider', ...]);
+angular.module('myApp', ['touk.slider', ...]);
 ```
 
 **NOTE:** in IE10/11 an annoying tooltip will show up unless you add the following css:

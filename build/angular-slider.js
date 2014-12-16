@@ -42,7 +42,7 @@ window.AngularSlider = (function( window, document, undefined ) {
       };
     }
     else {
-      hasOwnProp = function (object, property) { 
+      hasOwnProp = function (object, property) {
         return ((property in object) && is(object.constructor.prototype[property], 'undefined'));
       };
     }
@@ -197,7 +197,7 @@ window.AngularSlider = (function( window, document, undefined ) {
 
        }
 
-       return AngularSlider; 
+       return AngularSlider;
      };
 
 
@@ -222,7 +222,7 @@ AngularSlider.load=function(){yepnope.apply(window,[].slice.call(arguments,0));}
  License: MIT
  */
 /* global AngularSlider */
-angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
+angular.module('touk.slider', ['ngTouch']).directive('slider',
 	['$timeout', '$document', '$interpolate', '$swipe',
 		function($timeout, $document, $interpolate, $swipe) {
             'use strict';

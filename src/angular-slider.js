@@ -4,7 +4,7 @@
  License: MIT
  */
 /* global AngularSlider */
-angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
+angular.module('touk.slider', ['ngTouch']).directive('slider',
 	['$timeout', '$document', '$interpolate', '$swipe',
 		function($timeout, $document, $interpolate, $swipe) {
             'use strict';

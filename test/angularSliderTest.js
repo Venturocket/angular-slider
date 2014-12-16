@@ -9,7 +9,7 @@ describe('Unit: Slider Directive', function () {
     var $document;
     var element;
 
-    beforeEach(module('vr.directives.slider'));
+    beforeEach(module('touk.slider'));
 
     beforeEach(inject(function (_$compile_, _$rootScope_, _$timeout_, _$document_) {
         $compile = _$compile_;
