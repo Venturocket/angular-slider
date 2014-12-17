@@ -2,12 +2,25 @@ language: node_js
 node_js:
   - 0.10
 
-before_script:
+# Google Chrome
+#
+# https://github.com/travis-ci/travis-ci/issues/272#issuecomment-14402117
+# http://stackoverflow.com/questions/19255976/how-to-make-travis-execute-angular-tests-on-chrome-please-set-env-variable-chr
+#
+before_install:
+  - export CHROME_BIN=chromium-browser
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
   - npm install -g karma
   - npm install -g bower
+  - npm install -g grunt-cli
+
+install:
+  - npm install
   - bower install
 
+before_script:
+  - grunt
+
 script:
-  - karma start --no-auto-watch --single-run --reporters dots --browsers Firefox
+  - karma start --no-auto-watch --single-run --reporters dots

@@ -1,24 +1,38 @@
-module.exports = function(config){
+module.exports = function (config) {
     'use strict';
-    config.set({
+    var configuration = {
         basePath: '',
         frameworks: ['jasmine'],
 
         files: [
             //libraries
-            'lib/jquery-2.0.3.min.js',
+            'bower_components/jquery/dist/jquery.js',
             'bower_components/angular/angular.js',
             'bower_components/angular-touch/angular-touch.js',
             'bower_components/angular-mocks/angular-mocks.js',
 
             //our directive(s)
-            'src/rangeInputSupported.js',
-            'src/angular-slider.js',
+            //'src/rangeInputSupported.js',
+            //'src/angular-slider.js',
+            'build/touk-angular-slider.js',
 
             //tests
             'test/*.js'
         ],
         autoWatch: true,
-        browsers: ['Firefox']
-    });
+        browsers: ['Firefox', 'PhantomJS', 'Chrome', 'ChromeCanary'],
+        customLaunchers: {
+            Chrome_travis_ci: {
+                base: 'Chrome',
+                flags: ['--no-sandbox']
+            }
+        }
+    };
+
+    if (process.env.TRAVIS) {
+        configuration.browsers = ['Firefox', 'PhantomJS', 'Chrome_travis_ci'];
+    }
+
+    config.set(configuration);
+
 };

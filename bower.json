@@ -1,31 +1,29 @@
 {
-    "name": "angular-slider",
-    "version": "0.3.2",
-    "main": "./build/angular-slider.js",
-    "ignore": [
-        "**/.*",
-        "node_modules",
-        "components",
-        "lib",
-        "src",
-        "test",
-		".g*",
-		".editorconfig",
-		".jshintrc",
-		".travis.yml",
-		"Gruntfile.js",
-		"karma.conf.js",
-		"*.html"
-    ],
-    "dependencies": {
-        "angular": "~1.2",
-        "angular-touch": "~1.2"
-    },
-    "devDependencies": {
-        "angular-mocks": "*",
-		"angular-scenario": "*"
-    },
-	"resolutions": {
-		"angular": "v1.2.16"
-	}
+  "name": "touk-angular-slider",
+  "version": "0.3.3",
+  "main": "./build/touk-angular-slider.js",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "components",
+    "lib",
+    "src",
+    "test",
+    ".g*",
+    ".editorconfig",
+    ".jshintrc",
+    ".travis.yml",
+    "Gruntfile.js",
+    "karma.conf.js",
+    "*.html"
+  ],
+  "dependencies": {
+    "angular": ">= 1.2 < 1.4",
+    "angular-touch": ">= 1.2 < 1.4"
+  },
+  "devDependencies": {
+    "angular-mocks": "*",
+    "angular-scenario": "*",
+    "jquery": ">= 2.1 < 2.2"
+  }
 }

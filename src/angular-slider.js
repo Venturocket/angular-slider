@@ -4,7 +4,7 @@
  License: MIT
  */
 /* global AngularSlider */
-angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
+angular.module('touk.slider', ['ngTouch']).directive('slider',
 	['$timeout', '$document', '$interpolate', '$swipe',
 		function($timeout, $document, $interpolate, $swipe) {
             'use strict';
@@ -291,17 +291,17 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                             fullBar     : refs[0],                                        // background bar
                             stepBubs    : refs[1],                                        // the steps bubbles
                             selBar      : dual ? refs[2] : null,                          // dual knob: the bar between knobs
-                            unSelBarLow : dual ? refs[3] : null,                          // dual knob: the bar to the left of the low knob
+                            unSelBarLow : dual ? refs[3] : refs[2],                       // dual knob: the bar to the left of the low knob
                             unSelBarHigh: dual ? refs[4] : null,                          // dual knob: the bar to the right of the high knob
-                            minPtr      : dual ? refs[5] : refs[2],                       // single knob: the knob, dual knob: the low knob
+                            minPtr      : dual ? refs[5] : refs[3],                       // single knob: the knob, dual knob: the low knob
                             maxPtr      : dual ? refs[6] : null,                          // dual knob: the high knob
-                            lowBub      : dual ? refs[7] : refs[3],                       // single knob: the value bubble, dual knob: the low value bubble
+                            lowBub      : dual ? refs[7] : refs[4],                       // single knob: the value bubble, dual knob: the low value bubble
                             highBub     : dual ? refs[8] : null,                          // dual knob: the high value bubble
                             cmbBub      : dual ? refs[9] : null,                          // dual knob: the range values bubble
                             selBub      : dual ? refs[10] : null,                         // dual knob: the range width bubble
-                            flrBub      : dual ? refs[11] : refs[4],                      // the lower limit bubble
-                            ceilBub     : dual ? refs[12] : refs[5],                      // the upper limit bubble
-                            minInput    : inputs ? (dual ? refs[13] : refs[6]) : null,    // single knob: the actual slider input, dual knob: the low value slider input
+                            flrBub      : dual ? refs[11] : refs[5],                      // the lower limit bubble
+                            ceilBub     : dual ? refs[12] : refs[6],                      // the upper limit bubble
+                            minInput    : inputs ? (dual ? refs[13] : refs[7]) : null,    // single knob: the actual slider input, dual knob: the low value slider input
                             maxInput    : inputs ? (dual ? refs[14] : null) : null,       // dual knob: the high value slider input
                             selInput    : inputs ? (dual ? refs[15] : null) : null        // dual knob: the selection slider input
                         };
@@ -427,7 +427,7 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                         watchables.unshift('buffer');
                     } else {
                         // single knob so get rid of what we don't need
-                        var _ref1 = [refs.selBar, refs.unSelBarLow, refs.unSelBarHigh, refs.maxPtr, refs.selBub, refs.highBub, refs.cmbBub];
+                        var _ref1 = [refs.selBar, refs.unSelBarHigh, refs.maxPtr, refs.selBub, refs.highBub, refs.cmbBub];
                         for(var _i = 0, _len = _ref1.length; _i < _len; _i++) {
                             element = _ref1[_i];
                             element.remove();
@@ -928,6 +928,12 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                     offset(refs.lowBub,
                                         offsetFromPercent(percentFromOffset(offsetLeft(refs.minPtr) - halfWidth(refs.lowBub) + pointerHalfWidth)));
 
+									// set the low unselected bar's new position and width
+									refs.unSelBarLow.css({
+										left : 0,
+										width: offsetFromPercent(stretchedLowPercent + ptrHalfWidthPercent)
+									});
+
                                     if(isDualKnob) {
                                         // dual knob slider
 
@@ -994,12 +1000,6 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                         // set the selection bubbles' new positions
                                         offset(refs.selBub, offsetFromPercent(((stretchedLowPercent + stretchedHighPercent) / 2) - percentFromOffset(halfWidth(refs.selBub) + minOffset) + ptrHalfWidthPercent));
                                         offset(refs.cmbBub, offsetFromPercent(((stretchedLowPercent + stretchedHighPercent) / 2) - percentFromOffset(halfWidth(refs.cmbBub) + minOffset) + ptrHalfWidthPercent));
-
-                                        // set the low unselected bar's new position and width
-                                        refs.unSelBarLow.css({
-                                            left : 0,
-                                            width: offsetFromPercent(stretchedLowPercent + ptrHalfWidthPercent)
-                                        });
 
                                         // set the high unselected bar's new position and width
                                         offset(refs.unSelBarHigh, offsetFromPercent(stretchedHighPercent + ptrHalfWidthPercent));
@@ -1186,6 +1186,16 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                 }
 
                                 /**
+                                 * Get X coord from click, touch etc. event
+                                 * @param {object} event
+                                 * @returns {number}
+                                 */
+                                function getXFromEvent(event) {
+                                    var _ref, _ref1, _ref2;
+                                    return event.clientX || event.x || ((_ref = event.touches) != null ? _ref[0].clientX : void 0) || ((_ref1 = event.originalEvent) != null ? (_ref2 = _ref1.touches) != null ? _ref2[0].clientX : void 0 : void 0);
+                                }
+
+                                /**
                                  * What to do when the knob/bar is moved
                                  * @param {object} event
                                  */
@@ -1199,7 +1209,7 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                              * The current x position of the mouse/finger/etc.
                                              * @type {number}
                                              */
-                                            var currentX = event.clientX || event.x;
+                                            var currentX = getXFromEvent(event);
 
                                             if(dragRange) {
                                                 // the entire range is being dragged
@@ -1378,6 +1388,8 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
 												scope.ngChange();
 											}
 											ctrl.$setViewValue(scope[refLow]);
+                                            ctrl.$setDirty();
+                                            ctrl .$setTouched();
 
                                             // update the DOM
                                             setPointers();
@@ -1405,7 +1417,7 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
 									 * The current x position of the mouse/finger/etc.
 									 * @type {number}
 									 */
-									var currentX = event.clientX || event.x;
+                                    var currentX = getXFromEvent(event);
 
                                     // save the pointer reference
                                     pointer = ptr;
@@ -1549,6 +1561,8 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                         bindSwipeStart(refs.minPtr, refLow);
                                         bindSwipeStart(refs.lowBub, refLow);
                                         bindSwipeStart(refs.flrBub, refLow, refs.minPtr);
+                                        bindSwipeStart(refs.unSelBarLow, refLow, refs.minPtr);
+                                        bindSwipeStart(refs.stepBubs, refLow, refs.minPtr);
                                         if(isDualKnob) {
                                             // bind the dual knob specific events to the dual knob specific elements
                                             bindSwipeStart(refs.maxPtr, refHigh);
@@ -1556,7 +1570,6 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                             bindSwipeStart(refs.ceilBub, refHigh, refs.maxPtr);
                                             bindSwipeStart(refs.selBar, refSel);
                                             bindSwipeStart(refs.selBub, refSel, refs.selBar);
-                                            bindSwipeStart(refs.unSelBarLow, refLow, refs.minPtr);
                                             bindSwipeStart(refs.unSelBarHigh, refHigh, refs.maxPtr);
                                         } else {
                                             // bind the single knob specific events to the single knob specific elements

@@ -1,6 +1,6 @@
 {
-    "name": "angular-slider",
-    "version": "0.3.2",
+    "name": "touk-angular-slider",
+    "version": "0.3.3",
     "description": "Slider directive for AngularJS.",
     "main": "",
     "scripts": {
@@ -9,21 +9,21 @@
     },
     "repository": {
         "type": "git",
-        "url": "git://github.com/Venturocket/angular-slider.git"
+        "url": "git://github.com/JulianWielga/angular-slider.git"
     },
-    "author": "Venturocket, Inc.",
+    "author": "Julian Wielga",
     "license": "MIT",
     "devDependencies": {
         "karma": "~0.10",
-        "karma-jasmine": "*",
-        "karma-chrome-launcher": "*",
-        "karma-firefox-launcher": "*",
+        "karma-jasmine": "~0.1.0",
         "grunt": "~0.4.1",
         "grunt-contrib-jshint": "^0.10.0",
         "grunt-contrib-nodeunit": "~0.2.0",
         "grunt-contrib-uglify": "~0.2.2",
         "grunt-contrib-concat": "*",
         "jshint-stylish": "^0.2.0",
-        "karma-phantomjs-launcher": "^0.1.4"
+        "karma-chrome-launcher": "*",
+        "karma-firefox-launcher": "*",
+        "karma-phantomjs-launcher": "*"
     }
 }

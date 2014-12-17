@@ -1,5 +1,11 @@
-# angular-slider [![Build Status](https://secure.travis-ci.org/Venturocket/angular-slider.png?branch=master)](http://travis-ci.org/Venturocket/angular-slider)
-Slider directive for AngularJS. https://venturocket.github.io/angular-slider  
+## merged from CrossLead/angular-slider
+- Added touch event check in onMove() and onStart()
+
+## modified in fork
+- Single knob selection bar (SPAN.bar.unselected.low)
+
+# angular-slider [![Build Status](https://travis-ci.org/JulianWielga/angular-slider.svg?branch=master)](https://travis-ci.org/JulianWielga/angular-slider)
+Slider directive for AngularJS. https://julianwielga.github.io/angular-slider  
 License: MIT
 
 ## Features
@@ -12,16 +18,16 @@ License: MIT
 - Full touch event support
 
 ## Known Issues
-- When hidden during initialization (`display: none;`) the slider might not display correctly when shown. Issue `$scope.$broadcast('refreshSlider');` 
-in a parent scope to tell the slider to update the DOM. 
-- The `step` attribute conflicts with angular-foundation's `step` directive ([docs](http://madmimi.github.io/angular-foundation/#/tour)). To remedy this, 
-use `step-width` instead (it's an alias of `step`). `step` will be deprecated in the next minor release, so if you want to do a bit of future proofing 
+- When hidden during initialization (`display: none;`) the slider might not display correctly when shown. Issue `$scope.$broadcast('refreshSlider');`
+in a parent scope to tell the slider to update the DOM.
+- The `step` attribute conflicts with angular-foundation's `step` directive ([docs](http://madmimi.github.io/angular-foundation/#/tour)). To remedy this,
+use `step-width` instead (it's an alias of `step`). `step` will be deprecated in the next minor release, so if you want to do a bit of future proofing
 you can start using `step-width` now and save yourself a bit of migration work later .
 
 ## Installation
 
 ```
-bower install venturocket-angular-slider
+bower install touk-angular-slider
 ```
 
 ## Usage
@@ -35,10 +41,10 @@ Add `<script>`s to your `html` files for [angular](https://github.com/angular/bo
 <script src="build/angular-slider.min.js"></script>
 ```
 
-And add `vr.directives.slider` as a dependency for your app:
+And add `touk.slider` as a dependency for your app:
 
 ```javascript
-angular.module('myApp', ['vr.directives.slider', ...]);
+angular.module('myApp', ['touk.slider', ...]);
 ```
 
 **NOTE:** in IE10/11 an annoying tooltip will show up unless you add the following css:
@@ -152,7 +158,7 @@ As an attribute:
 
 
 ## Scaling
-You can supply any arbitrary scaling function (and its inverse) to the slider to suit your needs. 
+You can supply any arbitrary scaling function (and its inverse) to the slider to suit your needs.
 The inverse scaling function MUST be specified if a scaling function is specified (and vice versa).
 The scaling/inverse function can be pretty much anything as long as they take a number as a parameter and return a number. Like this:
 ```javascript
