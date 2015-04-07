@@ -1590,7 +1590,7 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                             // listen for a refresh event
                             scope.$on('refreshSlider', function() {
                                 // update the DOM, but make sure everything has been digested first
-                                $timeout(updateDOM);
+                                updateDOM();
                             });
 
                             // wait for everything to be digested then set up the DOM
