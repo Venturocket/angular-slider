@@ -832,7 +832,9 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                  * @returns {string}
                                  */
                                 function offsetFromPercent(percent) {
-                                    return pixelize(percent * offsetRange / 100);
+									var px = percent * offsetRange / 100;
+									px = (!isNaN(px)) ? px : 0;
+                                    return pixelize(px);
                                 }
 
                                 /**
