@@ -36,6 +36,7 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
              * @returns {string}
              */
             function pixelize(position) {
+				position = (!isNaN(position)) ? position : 0;
                 return '' + position + 'px';
             }
 
