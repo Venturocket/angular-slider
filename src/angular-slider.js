@@ -36,6 +36,7 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
              * @returns {string}
              */
             function pixelize(position) {
+				position = (!isNaN(position)) ? position : 0;
                 return '' + position + 'px';
             }
 
@@ -831,7 +832,9 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                  * @returns {string}
                                  */
                                 function offsetFromPercent(percent) {
-                                    return pixelize(percent * offsetRange / 100);
+									var px = percent * offsetRange / 100;
+									px = (!isNaN(px)) ? px : 0;
+                                    return pixelize(px);
                                 }
 
                                 /**
@@ -1199,7 +1202,7 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                              * The current x position of the mouse/finger/etc.
                                              * @type {number}
                                              */
-                                            var currentX = event.clientX || event.x;
+											var currentX = event.clientX || event.x || (event.touches ? event.touches[0].clientX : ((event.originalEvent) ? event.originalEvent.touches[0].clientX : 0));
 
                                             if(dragRange) {
                                                 // the entire range is being dragged
@@ -1405,7 +1408,7 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
 									 * The current x position of the mouse/finger/etc.
 									 * @type {number}
 									 */
-									var currentX = event.clientX || event.x;
+									var currentX = event.clientX || event.x || (event.touches ? event.touches[0].clientX : ((event.originalEvent) ? event.originalEvent.touches[0].clientX : 0));
 
                                     // save the pointer reference
                                     pointer = ptr;
@@ -1465,7 +1468,6 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                              * @param {event} ev
                                              */
                                             function end(coords, ev) {
-                                                onMove(ev);
                                                 onEnd();
                                             }
 
@@ -1535,7 +1537,6 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                                     onMove(ev);
                                                 },
                                                 end   : function(coords, ev) {
-                                                    onMove(ev);
                                                     onEnd();
                                                 },
                                                 cancel: function(coords, ev) {
