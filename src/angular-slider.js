@@ -1468,7 +1468,6 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                              * @param {event} ev
                                              */
                                             function end(coords, ev) {
-                                                onMove(ev);
                                                 onEnd();
                                             }
 
@@ -1538,7 +1537,6 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                                     onMove(ev);
                                                 },
                                                 end   : function(coords, ev) {
-                                                    onMove(ev);
                                                     onEnd();
                                                 },
                                                 cancel: function(coords, ev) {
