@@ -982,8 +982,14 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
 
                                         // set the high knob's and bubble's new positions
                                         offset(refs.maxPtr, offsetFromPercent(stretchedHighPercent));
-                                        offset(refs.highBub, offsetFromPercent(percentFromOffset(offsetLeft(refs.maxPtr) - halfWidth(refs.highBub) +
-                                                                                                 pointerHalfWidth)));
+                                        
+                                        // ensure the right slider's bubble doesn't exceed its limit
+                                        var offsetVal = percentFromOffset(offsetLeft(refs.maxPtr) - halfWidth(refs.highBub) + pointerHalfWidth);
+                                        var offsetLimit = percentFromOffset(offsetLeft(refs.ceilBub) + width(refs.ceilBub) - width(refs.highBub));
+                                        if (offsetVal > offsetLimit) {
+                                            offsetVal = offsetLimit;
+                                        }
+                                        offset(refs.highBub, offsetFromPercent(offsetVal));
 
                                         // set the selection bar's new position and width
                                         offset(refs.selBar, offsetFromPercent(stretchedLowPercent + ptrHalfWidthPercent));
