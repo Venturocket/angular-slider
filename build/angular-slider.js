@@ -1708,7 +1708,8 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                             // bind the events to the high value range input
                                             bindSlider(refs.maxInput, refs.maxPtr, refHigh);
                                             // bind the events to the selection bar range input
-                                            bindSlider(refs.selInput, refs.selBar, refSel);
+                                            if(angular.isUndefined(scope.baseLocked))
+                                                bindSlider(refs.selInput, refs.selBar, refSel);
                                         }
                                     } else {
                                         // we're using normal DOM elements
