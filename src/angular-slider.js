@@ -231,6 +231,7 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                     buffer              : '@',   // how close can the two knobs of a dual knob slider get?
                     stickiness          : '@',   // how sticky should the knobs feel...seriously, how did this get all sticky? gross
                     changeend           : '&',   // change end
+                    baseLocked          : '@',
                     showSteps           : '@',   // show the step value bubbles?
                     ngModel             : '=',   // single knob/dual know low value binding
                     ngModelRange        : '=',   // dual knob high value binding
@@ -1482,7 +1483,8 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
                                         }
 
                                         // bind the events to the low value range input
-                                        bindSlider(refs.minInput, refs.minPtr, refLow);
+                                        if(angular.isUndefined(scope.baseLocked))
+                                            bindSlider(refs.minInput, refs.minPtr, refLow);
 
                                         if(isDualKnob) {
                                             // bind the events to the high value range input
