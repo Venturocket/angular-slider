@@ -1,6 +1,6 @@
 {
     "name": "angular-slider",
-    "version": "0.3.2",
+    "version": "0.3.3",
     "main": "./build/angular-slider.js",
     "ignore": [
         "**/.*",
@@ -18,14 +18,14 @@
 		"*.html"
     ],
     "dependencies": {
-        "angular": "~1.2",
-        "angular-touch": "~1.2"
+        "angular": "~1.4",
+        "angular-touch": "~1.4"
     },
     "devDependencies": {
         "angular-mocks": "*",
 		"angular-scenario": "*"
     },
 	"resolutions": {
-		"angular": "v1.2.16"
+		"angular": "v1.4"
 	}
 }

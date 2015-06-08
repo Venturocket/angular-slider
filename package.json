@@ -1,6 +1,6 @@
 {
     "name": "angular-slider",
-    "version": "0.3.2",
+    "version": "0.3.3",
     "description": "Slider directive for AngularJS.",
     "main": "",
     "scripts": {
