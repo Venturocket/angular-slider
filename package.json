@@ -2,7 +2,7 @@
     "name": "angular-slider",
     "version": "0.3.2",
     "description": "Slider directive for AngularJS.",
-    "main": "",
+    "main": "./build/angular-slider.js",
     "scripts": {
         "test": "karma start --single-run --no-auto-watch",
         "dev": "karma start --browsers=PhantomJS --reporters=dots"
