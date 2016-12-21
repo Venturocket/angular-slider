@@ -1,12 +1,22 @@
 /* global beforeEach */
 beforeEach(function(){
     'use strict';
-    this.addMatchers({
-        toHaveClass: function(cls){
-            this.message = function(){
-                return 'Expected "' + angular.mock.dump(this.actual) + '"'+(this.isNot?' not':'')+' to have class "' + cls + '".';
-            };
-            return this.actual.hasClass(cls);
+    jasmine.addMatchers({
+        toHaveClass: function(){
+            return  {
+                compare: function(actual, expected){
+                    var result = {};
+                    result.pass = actual.hasClass(expected);
+                    result.message =  'Expected "' + angular.mock.dump(actual) + '"'+' to have class "' + expected + '".';
+                    return result;
+                },
+                negativeCompare: function(actual, expected){
+                    var result = {};
+                    result.pass = !actual.hasClass(expected);
+                    result.message =  'Expected "' + angular.mock.dump(actual) + '"'+'not to have class "' + expected + '".';
+                    return result;
+                }
+            }
         }
     });
 });
