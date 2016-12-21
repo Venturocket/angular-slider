@@ -1,29 +1,30 @@
 {
-    "name": "angular-slider",
-    "version": "0.3.2",
-    "description": "Slider directive for AngularJS.",
-    "main": "./build/angular-slider.js",
-    "scripts": {
-        "test": "karma start --single-run --no-auto-watch",
-        "dev": "karma start --browsers=PhantomJS --reporters=dots"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git://github.com/Venturocket/angular-slider.git"
-    },
-    "author": "Venturocket, Inc.",
-    "license": "MIT",
-    "devDependencies": {
-        "karma": "~0.10",
-        "karma-jasmine": "*",
-        "karma-chrome-launcher": "*",
-        "karma-firefox-launcher": "*",
-        "grunt": "~0.4.1",
-        "grunt-contrib-jshint": "^0.10.0",
-        "grunt-contrib-nodeunit": "~0.2.0",
-        "grunt-contrib-uglify": "~0.2.2",
-        "grunt-contrib-concat": "*",
-        "jshint-stylish": "^0.2.0",
-        "karma-phantomjs-launcher": "^0.1.4"
-    }
+  "name": "angular-slider",
+  "version": "0.3.2",
+  "description": "Slider directive for AngularJS.",
+  "main": "./build/angular-slider.js",
+  "scripts": {
+    "test": "karma start --single-run --no-auto-watch",
+    "dev": "karma start --browsers=PhantomJS --reporters=dots"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Venturocket/angular-slider.git"
+  },
+  "author": "Venturocket, Inc.",
+  "license": "MIT",
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-concat": "*",
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-contrib-nodeunit": "~0.2.0",
+    "grunt-contrib-uglify": "~0.2.2",
+    "jasmine": "^2.5.2",
+    "jshint-stylish": "^0.2.0",
+    "karma": "^1.3.0",
+    "karma-chrome-launcher": "^2.0.0",
+    "karma-firefox-launcher": "^1.0.0",
+    "karma-jasmine": "^1.1.0",
+    "karma-phantomjs-launcher": "^0.1.4"
+  }
 }

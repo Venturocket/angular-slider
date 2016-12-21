@@ -32,7 +32,7 @@ describe('Unit: Slider Directive', function() {
 						return '#'+value+'%';
 					}
 				};
-				spyOn($rootScope.skill,'translate').andCallThrough();
+				spyOn($rootScope.skill,'translate').and.callThrough();
 				element = $compile('<slider floor="1" ceiling="3" step="0.25" precision="2" translate-fn="skill.translate" ng-model="skill.value"></slider>')($rootScope);
 				$rootScope.$digest();
 				$(element).find('span').css({'display':'block','position':'absolute'});
@@ -334,7 +334,7 @@ describe('Unit: Slider Directive', function() {
 						return '#'+value+'%';
 					}
 				};
-				spyOn($rootScope.skill,'translate').andCallThrough();
+				spyOn($rootScope.skill,'translate').and.callThrough();
 				element = $compile('<slider floor="1" ceiling="3" step="0.25" precision="2" translate-fn="skill.translate" ng-model="skill.value"></slider>')($rootScope);
 				$rootScope.$digest();
 				$(element).find('span').css({'display':'block','position':'absolute'});
