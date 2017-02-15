@@ -925,8 +925,8 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
 
                                     // set the low knob's and bubble's new positions
                                     offset(refs.minPtr, offsetFromPercent(stretchedLowPercent));
-                                    offset(refs.lowBub,
-                                        offsetFromPercent(percentFromOffset(offsetLeft(refs.minPtr) - halfWidth(refs.lowBub) + pointerHalfWidth)));
+	                                offset(refs.lowBub, Math.min(parseInt(offsetFromPercent(percentFromOffset(offsetLeft(refs.minPtr) - halfWidth(refs.lowBub) + pointerHalfWidth))), barWidth - width(refs.lowBub)) + 'px');
+
 
                                     if(isDualKnob) {
                                         // dual knob slider
@@ -969,8 +969,7 @@ angular.module('vr.directives.slider', ['ngTouch']).directive('slider',
 
                                             // and re-set the low knob's and bubble's new positions
                                             offset(refs.minPtr, offsetFromPercent(stretchedLowPercent));
-                                            offset(refs.lowBub, offsetFromPercent(percentFromOffset(offsetLeft(refs.minPtr) - halfWidth(refs.lowBub) +
-                                                                                                    pointerHalfWidth)));
+	                                        offset(refs.lowBub, Math.min(parseInt(offsetFromPercent(percentFromOffset(offsetLeft(refs.minPtr) - halfWidth(refs.lowBub) + pointerHalfWidth))), barWidth - width(refs.lowBub)) + 'px');
                                         }
 
                                         if(stretchedHighPercent < rawLowPercent + bufferWidthPercentLow) {
